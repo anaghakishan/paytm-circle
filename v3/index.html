@@ -326,7 +326,7 @@ input{font:inherit;color:inherit;border:0;outline:0;background:none;min-width:0}
   </div>
   <aside id="demo">
     <h3>Prototype controls</h3>
-    <p>Two ways into the Circle: <b>Home → Recharge &amp; Bills → Add your Circle</b>, or <b>Mobile Recharge → payment success → Add your Circle</b> (the recharge bill comes into the circle already fetched). v3: short bill suggestions, flat ₹25–₹50 off for each new bill type, one person per mobile recharge, and who paid on the Split tab.</p>
+    <p>Two ways into the Circle: <b>Home → Recharge &amp; Bills → Add your Circle</b>, or <b>Electricity Bill → payment success → Add your Circle</b> (the paid bill comes into the circle already fetched). v3: short bill suggestions, flat ₹25–₹50 off for each new bill type, and who paid on the Split tab.</p>
     <button data-d="home">Open Home</button>
     <button data-d="pay">Open payment success</button>
     <button data-d="month">Simulate next month's bills</button>
@@ -402,7 +402,6 @@ const CONTACTS=[
  {id:'c9',name:'Vikram Nair',phone:'98860 90123',color:'lav'}
 ];
 const CATS={
- mobile:{t:'Mobile Recharge',ic:'phone',b:['Jio Prepaid','Airtel Prepaid','Vi Prepaid'],f:'Mobile Number',v:'98765 43210',a:899,info:'Plan ₹899 · 84 days'},
  electricity:{t:'Electricity Bill',ic:'bulb',b:['BESCOM','Tata Power','Adani Electricity'],f:'Consumer Number',v:'1234 5678 90',a:1840},
  lpg:{t:'Book Gas Cylinder',ic:'cyl',b:['Indane Gas','HP Gas','Bharat Gas'],f:'LPG ID / Registered Mobile',v:'7100 0045 6789',a:905,info:'1 cylinder · 14.2 kg'},
  broadband:{t:'Broadband Bill',ic:'wifi',b:['Airtel Xstream Fiber','ACT Fibernet','JioFiber'],f:'Account Number',v:'2045 7781',a:1179},
@@ -481,7 +480,7 @@ const PAGES={},SHEETS={},AFTER={},ACT={},INP={};
 /* ---- HOME ---- */
 const phoneArt='<svg width="120" height="110" viewBox="0 0 120 110"><path d="M10 34l6-6" stroke="#F2649B" stroke-width="3" stroke-linecap="round"/><path d="M104 66l12-4" stroke="#2BD6B5" stroke-width="4" stroke-linecap="round"/><g transform="rotate(14 60 55)"><rect x="38" y="10" width="46" height="90" rx="9" fill="#1E5FD8"/><rect x="42" y="14" width="38" height="82" rx="6" fill="#EAF6FF"/><circle cx="61" cy="53" r="13" fill="#3EC56B"/><path d="m55 53 4 4 8-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></g><circle cx="20" cy="76" r="13" fill="#F4C443" stroke="#D99A12" stroke-width="2"/><text x="20" y="81" font-size="13" text-anchor="middle" fill="#B5770B" font-weight="700">₹</text><circle cx="92" cy="14" r="12" fill="#F4C443" stroke="#D99A12" stroke-width="2"/><text x="92" y="19" font-size="12" text-anchor="middle" fill="#B5770B" font-weight="700">₹</text></svg>';
 PAGES.home=()=>{
-  const tiles=[['phone','Mobile<br>Recharge','mobile'],['card','Credit Card<br>Bill'],['bulb','Electricity<br>Bill'],['tag','FASTag<br>Recharge'],['cyl','Book Gas<br>Cylinder'],['wifi','Broadband<br>Bill'],['tv','DTH<br>Recharge']];
+  const tiles=[['phone','Mobile<br>Recharge'],['card','Credit Card<br>Bill'],['bulb','Electricity<br>Bill','electricity'],['tag','FASTag<br>Recharge'],['cyl','Book Gas<br>Cylinder'],['wifi','Broadband<br>Bill'],['tv','DTH<br>Recharge']];
   return '<div class="scr home"><div class="body">'+
   '<div class="h-top"><div class="av-as">AS</div><div class="gold">Get up to <b>10,000</b><br>Gold coins <span class="gold-go">'+ic('right',10,'#fff',3.4)+'</span></div><span class="sp"></span><button class="ib" data-a="nyi" aria-label="Search">'+ic('search',26,'#131313',2)+'</button><button class="ib" data-a="nyi" aria-label="Notifications">'+ic('bell',26,'#131313',2)+'</button></div>'+
   '<div class="banner"><div class="bn-t">Send money to loved ones on-the-go</div><button class="bn-b" data-a="nyi">Use Paytm for UPI</button><div class="bn-art">'+phoneArt+'</div><div class="dots"><i class="on"></i><i></i></div><span class="tnc">T&amp;C apply</span></div>'+
@@ -497,12 +496,12 @@ PAGES.home=()=>{
 AFTER.home=()=>{const t=document.getElementById('tiles'),i=document.getElementById('indi');if(!t)return;const f=()=>{const r=t.clientWidth/t.scrollWidth;i.style.width=(r*100)+'%';i.style.left=(t.scrollLeft/t.scrollWidth*100)+'%'};t.addEventListener('scroll',f);f()};
 
 /* ---- AI SUGGESTIONS (illustrative co-payment rates) ---- */
-const AISUG={mobile:[['electricity',82],['broadband',67]],electricity:[['lpg',86],['broadband',64]],lpg:[['electricity',91],['water',58]],broadband:[['electricity',79],['dth',61]],water:[['electricity',88],['lpg',72]],dth:[['broadband',71],['electricity',69]],other:[['electricity',80],['lpg',74]]};
-const SHORT={mobile:'Mobile Recharge',electricity:'Electricity Bill',lpg:'LPG Cylinder',broadband:'Broadband Bill',water:'Water Bill',dth:'DTH Recharge',other:'shared expenses'};
+const AISUG={electricity:[['lpg',86],['broadband',64]],lpg:[['electricity',91],['water',58]],broadband:[['electricity',79],['dth',61]],water:[['electricity',88],['lpg',72]],dth:[['broadband',71],['electricity',69]],other:[['electricity',80],['lpg',74]]};
+const SHORT={electricity:'Electricity Bill',lpg:'LPG Cylinder',broadband:'Broadband Bill',water:'Water Bill',dth:'DTH Recharge',other:'shared expenses'};
 function aiFor(cat,exclude){return (AISUG[cat]||[]).find(x=>!exclude.includes(x[0]))}
 function circleAI(c){const paid=c.bills.filter(b=>b.status==='paid');if(!paid.length)return null;const last=paid[paid.length-1];const cat=c.series.find(s=>s.id===last.sid).cat;
  const have=c.series.map(s=>s.cat).concat(c.aiDismiss||[]);const s=aiFor(cat,have);return s?{from:cat,to:s[0],p:s[1]}:null}
-const SHORT2={mobile:'Recharge',electricity:'Electricity',lpg:'LPG',broadband:'Broadband',water:'Water',dth:'DTH'};
+const SHORT2={electricity:'Electricity',lpg:'LPG',broadband:'Broadband',water:'Water',dth:'DTH'};
 const TIER=n=>n<=1?0:n===2?25:n===3?30:n===4?40:50;
 function catCount(c){return new Set(c.series.filter(s=>s.cat!=='other').map(s=>s.cat)).size}
 function nextOff(c){return TIER(catCount(c)+1)}
@@ -525,15 +524,15 @@ PAGES.payany=()=>{const sug=['c6','c2','c5','c1','c4','c7','c8','c9'];
 /* ---- PAYMENT SUCCESS ---- */
 PAGES.success=()=>'<div class="scr w"><div class="hdr"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button><span class="sp"></span><div class="logo">pay<span>tm</span></div><span class="sp"></span><span style="width:48px"></span></div>'+
  '<div class="body"><div class="sc-card"><div class="sc-in">'+
- '<div class="sc-t">Mobile Recharge Successful <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 1.5l2.6 1.9 3.2-.2 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.2L12 22.5l-2.6-1.9-3.2.2-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.2z" fill="#23C079"/><path d="m8 12.2 2.8 2.8L16.2 9.6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>'+
+ '<div class="sc-t">Electricity Bill Paid <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 1.5l2.6 1.9 3.2-.2 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.2L12 22.5l-2.6-1.9-3.2.2-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.2z" fill="#23C079"/><path d="m8 12.2 2.8 2.8L16.2 9.6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>'+
  '<div class="sc-d">14 Nov, 6:51 PM <a>View details</a></div>'+
- '<div class="sc-op"><div class="jio">Jio</div><div><div>Jio</div><div>98765 43210</div><div>Paid ₹899</div></div></div>'+
- '<div class="dash"></div><div class="note"><b>Note:</b> Plan benefits have been added to your account</div>'+
+ '<div class="sc-op"><div class="jio" style="background:#fff">'+ic('bulb',22,'#0B3F8F',1.7)+'</div><div><div>BESCOM</div><div>1234 5678 90</div><div>Paid ₹1,840</div></div></div>'+
+ '<div class="dash"></div><div class="note"><b>Note:</b> Payment has been sent to BESCOM</div>'+
  '<div class="sc-btns"><button class="pb f" data-a="nyi">Pay Another Bill</button><button class="pb o" data-a="circleEntry" data-v="payment">Add your Circle</button><button class="pb o" data-a="nyi">Download Invoice</button><button class="pb o" data-a="nyi">Share</button></div>'+
- aiCard('mobile','electricity',82,'aiFromPay',false,25)+
+ aiCard('electricity','lpg',86,'aiFromPay',false,25)+
  '</div><div class="scratch"><span class="sw">WIN</span>YOU WON A SCRATCH CARD &nbsp;•&nbsp; YOU WON</div></div>'+
  '<div class="goldb"><span class="coin"></span><span class="gt">Get 10,000<br>Paytm Gold Coins</span><span class="gp">Pay Now '+ic('arrowR',12,'#fff',2.2)+'</span></div>'+
- '<div class="rdone"><div class="g">Recharge done ✓</div><div class="b">Now unlock savings!</div></div><div style="height:110px"></div></div>'+
+ '<div class="rdone"><div class="g">Payment done ✓</div><div class="b">Now unlock savings!</div></div><div style="height:110px"></div></div>'+
  '<div class="bnav"><button data-a="goHome">'+ic('home',24,'#fff',1.7)+'Home</button><button data-a="nyi">'+ic('scan',24,'#fff',1.7)+'Scan</button><button data-a="nyi">'+ic('cash',24,'#fff',1.7)+'Cashback</button><button data-a="nyi">'+ic('book',24,'#fff',1.7)+'Passbook</button></div></div>';
 
 /* ---- ONBOARDING (story) ---- */
@@ -599,20 +598,20 @@ PAGES.circle=p=>{const c=circ(p.id);if(!c)return PAGES.home();const tab=p.tab||'
   body='<div class="scard" style="padding-bottom:0"><div style="font-size:17px;font-weight:700;padding:0 16px 2px;letter-spacing:-.2px">Balances</div>'+bal.rows.map(r=>'<div class="srow">'+av(r.m,'m')+'<div style="flex:1"><div style="font-size:15.5px">'+nm(r.m)+'</div><div style="font-size:13px;margin-top:2px;color:'+(r.v>0?'#15883A':r.v<0?'#D9343F':'#777')+'">'+(r.v>0?'owes you '+rs(r.v):r.v<0?'you owe '+rs(-r.v):'settled up')+'</div></div></div>'+
    (r.v>0?'<div class="sact"><button data-a="markRec" data-v="'+r.m+'">Mark as Received</button><i></i><button data-a="remind" data-v="'+r.m+'">Send Reminder</button></div>':r.v<0?'<div class="sact"><button data-a="settlePay" data-v="'+r.m+'" style="color:#004299">Pay '+rs(-r.v)+'</button></div>':'<div class="sact" style="padding:6px 0"></div>')).join('')+'</div>';
   body+='<div class="h2s" style="padding-top:22px">Bill splits</div>';
-  if(!c.series.length)body+='<div class="empty">'+'<p>No bills yet. Add a bill to set up its split.</p><button class="btn" style="margin-top:16px" data-a="addBill">'+ic('plus',20,'#fff',2.2)+'Add Bill</button></div>';
+  if(!c.series.length)body+='<div class="empty"><p>No bills yet</p></div>';
   body+=c.series.map(s=>{const lb=latestBill(c,s.id);const sh=lb?shareMap(lb.amount,lb.split):{};const inc=splitMembers(s.split);
    return '<div class="scard"><div class="shd"><span class="bic">'+ic(CATS[s.cat].ic,22,'#0B3F8F',1.7)+'</span><div style="flex:1;min-width:0"><div class="bt1">'+s.label+'</div><div class="bt2">'+(s.rec?ic('repeat',12,'#666',2)+' Monthly · ':'Once · ')+splitMembers(s.split).length+(splitMembers(s.split).length===1?' person':' people')+(s.split.mode==='equal'?'':' · '+({amount:'by amount',percent:'by %',shares:'by shares'})[s.split.mode])+'</div>'+payLine(lb)+'</div><button class="edit" data-a="editSplit" data-v="'+s.id+'">'+ic('edit',15,'#2074CA',2)+'Edit</button></div>'+
-   c.members.map(m=>inc.includes(m)?'<div class="mrow">'+av(m,'s')+'<span class="nm">'+nm(m)+'</span><span class="am">'+rs(sh[m]||0)+'</span></div>':s.cat==='mobile'?'':'<div class="mrow out">'+av(m,'s')+'<span class="nm">'+nm(m)+'</span><button class="addp" data-a="addOne" data-v="'+s.id+'|'+m+'">'+ic('plus',14,'#2074CA',2.6)+'Add</button></div>').join('')+'<div style="height:6px"></div>'+'</div>'}).join('');
+   c.members.map(m=>inc.includes(m)?'<div class="mrow">'+av(m,'s')+'<span class="nm">'+nm(m)+'</span><span class="am">'+rs(sh[m]||0)+'</span></div>':'<div class="mrow out">'+av(m,'s')+'<span class="nm">'+nm(m)+'</span><button class="addp" data-a="addOne" data-v="'+s.id+'|'+m+'">'+ic('plus',14,'#2074CA',2.6)+'Add</button></div>').join('')+'<div style="height:6px"></div>'+'</div>'}).join('');
  }
  return '<div class="scr"><div class="c-head"><div class="c-top"><button class="ib" data-a="goHome" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button><span class="sp"></span><button class="ac" data-a="share">'+ic('wa',28,'#222',1.5)+'Share</button><button class="ac" data-a="settings">'+ic('gear',26,'#222',1.5)+'Settings</button></div>'+
  '<div class="c-title">'+c.name+'</div><div class="bal"><div><div class="l">You will get</div><div class="v" style="color:#15883A">'+rs(bal.get)+'<span class="bdg" style="background:#15883A">'+ic('dl',13,'#fff',2.6)+'</span></div></div><div class="r"><div class="l">You need to pay</div><div class="v" style="color:#D9343F">'+rs(bal.pay)+'<span class="bdg" style="background:#E53940">'+ic('ur',13,'#fff',2.6)+'</span></div></div></div></div>'+
  '<div class="tabs"><button class="tab'+(tab==='bills'?' on':'')+'" data-a="tab" data-v="bills">Bills<span class="cnt">'+c.bills.filter(b=>b.status==='due').length+' due</span></button><button class="tab'+(tab==='split'?' on':'')+'" data-a="tab" data-v="split">Split</button><span class="sp"></span><span style="font-size:12.5px;color:#666;align-self:center">'+c.members.length+' members</span></div>'+
  '<div class="body">'+body+'<div style="height:100px"></div></div>'+
- (c.bills.length?'<button class="fab" data-a="addBill">'+ic('plus',24,'#fff',2)+'Add Bill</button>':'')+'</div>'};
+ (c.bills.length&&tab==='bills'?'<button class="fab" data-a="addBill">'+ic('plus',24,'#fff',2)+'Add Bill</button>':'')+'</div>'};
 function latestBill(c,sid){return c.bills.filter(b=>b.sid===sid).sort((a,b)=>a.month<b.month?1:-1)[0]}
 
 /* ---- ADD BILL: category ---- */
-PAGES.cats=()=>{const c=circ(T.draft.cid);const keys=['mobile','electricity','lpg','broadband','water','dth'];const off=nextOff(c),have=c.series.map(s=>s.cat);
+PAGES.cats=()=>{const c=circ(T.draft.cid);const keys=['electricity','lpg','broadband','water','dth'];const off=nextOff(c),have=c.series.map(s=>s.cat);
  return '<div class="scr"><div class="hdr"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button></div><div class="body">'+
  '<div class="h1">Add a bill</div><div style="font-size:15px;color:#555;padding:4px 12px 0">to '+c.name+'</div>'+
  '<div class="card" style="margin-top:20px"><div class="ctiles">'+keys.map(k=>'<button class="t" style="width:auto" data-a="pickCat" data-v="'+k+'"><span class="ti">'+ic(CATS[k].ic,28,'#0B3F8F',1.6)+'</span>'+(off&&!have.includes(k)?'<em>Flat ₹'+off+'</em>':'')+'<span>'+CATS[k].t.replace(' ','<br>')+'</span></button>').join('')+'</div></div>'+
@@ -669,7 +668,7 @@ AFTER.done=p=>{doneT=setTimeout(()=>{if(top().n==='done')ACT.doneNext()},2400)};
 
 /* ================= SHEETS ================= */
 function shHead(t){return '<div class="sh-h"><div class="sh-t">'+t+'</div><button class="xbtn" data-a="closeSheet" aria-label="Close">'+ic('x',14,'#fff',2.6)+'</button></div>'}
-SHEETS.circlePick=p=>shHead(p.src==='payment'?'Add this bill to':'Your circles')+'<div class="sh-b list">'+(p.src==='payment'?'<div style="margin:0 16px 8px;padding:10px 12px;border-radius:12px;background:var(--sky);font-size:13.5px;display:flex;gap:10px;align-items:center"><span class="jio" style="width:32px;height:32px;font-size:12px">Jio</span>Mobile Recharge · ₹899 · paid 14 Nov</div>':'')+
+SHEETS.circlePick=p=>shHead(p.src==='payment'?'Add this bill to':'Your circles')+'<div class="sh-b list">'+(p.src==='payment'?'<div style="margin:0 16px 8px;padding:10px 12px;border-radius:12px;background:var(--sky);font-size:13.5px;display:flex;gap:10px;align-items:center"><span class="jio" style="width:32px;height:32px;background:#fff">'+ic('bulb',18,'#0B3F8F',1.7)+'</span>Electricity Bill · ₹1,840 · paid 14 Nov</div>':'')+
  S.circles.map(c=>'<button class="row" style="width:100%" data-a="pickCircle" data-v="'+c.id+'"><span class="cic" style="margin-right:12px">'+ic('circle',26,'#FB7A74',2)+'</span><span class="tx"><span class="nm"><div class="n1">'+c.name+'</div><div class="n2">'+c.members.length+' members · '+c.series.length+' bills</div></span>'+ic('right',20,'#888',2)+'</span></button>').join('')+
  '<button class="row" style="width:100%" data-a="newCircle"><span class="av addm" style="margin-right:12px;background:#F4F6F8;border:1.5px dashed #C9CACC">'+ic('plus',24,'#222',1.8)+'</span><span class="tx"><span class="nm"><div class="n1" style="font-weight:600;color:#004299">Create new circle</div></span></span></button></div><div style="height:16px"></div>';
 SHEETS.whoPaid=()=>{const d=T.draft;const c=circ(d.cid);const fixed=d.cat!=='other';
@@ -689,7 +688,7 @@ SHEETS.pay=p=>{const c=circ(p.cid);const b=c.bills.find(x=>x.id===p.bid);const s
 SHEETS.settings=p=>{const c=circ(p.cid);return shHead('Circle settings')+'<div class="sh-b list">'+c.members.map(m=>'<div class="row">'+av(m)+'<span class="tx" style="min-height:64px"><span class="nm"><div class="n1">'+nm(m)+'</div><div class="n2">'+(m==='me'?'Admin':'Member')+'</div></span></span></div>').join('')+
  '<button class="row" style="width:100%" data-a="addMember"><span class="av" style="margin-right:12px;background:#F4F6F8;border:1.5px dashed #C9CACC">'+ic('plus',24,'#222',1.8)+'</span><span class="tx"><span class="nm"><div class="n1" style="font-weight:600;color:#004299">Add Member</div></span></span></button></div><div style="height:16px"></div>'};
 SHEETS.addToBills=p=>{const c=circ(p.cid);const names=p.mem.map(first).join(' & ');
- return shHead('Add '+names+' to bill splits?')+'<div class="sh-b list"><div style="padding:0 16px 8px;font-size:14px;color:#555">Choose the bills they should share. Their share starts this month and repeats every month.</div>'+c.series.filter(s=>s.cat!=='mobile').map(s=>{const on=T.pick.includes(s.id);return '<button class="row" style="width:100%" data-a="pickSeries" data-v="'+s.id+'"><span class="bic" style="margin-right:12px">'+ic(CATS[s.cat].ic,22,'#0B3F8F',1.7)+'</span><span class="tx"><span class="nm"><div class="n1">'+s.label+'</div><div class="n2">'+splitDesc(s.split)+'</div></span><span class="cb'+(on?'':' off')+'">'+(on?ic('check',16,'#1577DC',2.6):'')+'</span></span></button>'}).join('')+'</div>'+
+ return shHead('Add '+names+' to bill splits?')+'<div class="sh-b list"><div style="padding:0 16px 8px;font-size:14px;color:#555">Choose the bills they should share. Their share starts this month and repeats every month.</div>'+c.series.map(s=>{const on=T.pick.includes(s.id);return '<button class="row" style="width:100%" data-a="pickSeries" data-v="'+s.id+'"><span class="bic" style="margin-right:12px">'+ic(CATS[s.cat].ic,22,'#0B3F8F',1.7)+'</span><span class="tx"><span class="nm"><div class="n1">'+s.label+'</div><div class="n2">'+splitDesc(s.split)+'</div></span><span class="cb'+(on?'':' off')+'">'+(on?ic('check',16,'#1577DC',2.6):'')+'</span></span></button>'}).join('')+'</div>'+
  '<div class="sh-f" style="display:flex;gap:10px"><button class="btn ghost" data-a="closeSheet">Not now</button><button class="btn" data-a="addToBillsGo">Add</button></div>'};
 SHEETS.addOne=p=>{const c=circ(p.cid);const s=c.series.find(x=>x.id===p.sid);
  return shHead('Add '+first(p.m)+' to this bill?')+'<div class="sh-b" style="padding:0 16px"><div style="display:flex;align-items:center;gap:12px;margin:6px 0 12px">'+av(p.m)+'<div><div style="font-size:16px">'+nm(p.m)+'</div><div style="font-size:13px;color:#666">'+s.label+' · '+splitDesc(s.split)+'</div></div></div><div style="font-size:14px;color:#444;line-height:20px">'+(s.split.mode==='equal'?'The bill will be split equally among '+(s.split.members.length+1)+' people from this month and every month after.':'This bill uses a custom split, so you’ll set '+first(p.m)+'’s amount on the next screen.')+'</div></div>'+
@@ -708,25 +707,25 @@ function runSuggest(cid){const s=T.flow&&T.flow.suggest;if(!s)return;T.flow.sugg
 ACT.circleEntry=src=>{T.flow={src,sel:[],name:'Flat 402',mode:'create'};if(S.circles.length)sheet('circlePick',{src});else go('onboard',{i:0})};
 ACT.newCircle=()=>{SHEET=null;go('onboard',{i:0})};
 ACT.pickCircle=id=>{const c=circ(id);SHEET=null;if(T.flow.src==='payment'){if(c.series.some(s=>s.fromPay))toast('This recharge is already in '+c.name);else addPaymentBill(c);save()}
- NAV=[{n:'home',p:{}},{n:'circle',p:{id,tab:'bills'}}];render(true);if(T.flow.src==='payment')toast('Jio recharge ₹899 added to '+c.name);runSuggest(id)};
+ NAV=[{n:'home',p:{}},{n:'circle',p:{id,tab:'bills'}}];render(true);if(T.flow.src==='payment')toast('Electricity bill added to '+c.name);runSuggest(id)};
 ACT.storyTap=(v,el,e)=>{if(e.target.closest('button'))return;const p=top().p;const r=el.getBoundingClientRect();const right=e.clientX>r.left+r.width/2;p.i=Math.max(0,Math.min(STORY.length-1,(p.i||0)+(right?1:-1)));render()};
 ACT.obStart=()=>go('select');
 ACT.selToggle=id=>{const s=T.flow.sel;const i=s.indexOf(id);if(i>=0)s.splice(i,1);else s.push(id);const q=T.q;render();T.q=q};
-ACT.selContinue=()=>{const f=T.flow;if(f.mode==='addmember'){const c=circ(f.cid);c.members.push(...f.sel);c.hist.push({t:'You added '+f.sel.map(first).join(', '),d:today()});save();const mem=f.sel.slice();popTo('circle');toast(mem.map(first).join(', ')+' added to the circle');const ns=c.series.filter(s=>s.cat!=='mobile');if(ns.length){T.pick=ns.map(s=>s.id);sheet('addToBills',{cid:c.id,mem})}return}go('details')};
+ACT.selContinue=()=>{const f=T.flow;if(f.mode==='addmember'){const c=circ(f.cid);c.members.push(...f.sel);c.hist.push({t:'You added '+f.sel.map(first).join(', '),d:today()});save();const mem=f.sel.slice();popTo('circle');toast(mem.map(first).join(', ')+' added to the circle');const ns=c.series;if(ns.length){T.pick=ns.map(s=>s.id);sheet('addToBills',{cid:c.id,mem})}return}go('details')};
 ACT.detRemove=id=>{const s=T.flow.sel;s.splice(s.indexOf(id),1);if(!s.length){back();return}render()};
 ACT.createCircle=()=>{const f=T.flow;const c={id:uid('c'),name:f.name.trim(),members:['me',...f.sel],series:[],bills:[],settle:[],hist:[{t:'You created the circle',d:today()}]};
  if(f.src==='payment')addPaymentBill(c);S.circles.push(c);save();NAV=[{n:'home',p:{}},{n:'circle',p:{id:c.id,tab:'bills'}}];SHEET=null;render(true);
- toast(f.src==='payment'?'Circle created · your Jio recharge is already in it':'Circle created · add your first bill');runSuggest(c.id)};
-function addPaymentBill(c){const s={id:uid('s'),cat:'mobile',biller:'Jio Prepaid',consumer:'98765 43210',label:'Mobile Recharge',split:{mode:'equal',members:['me'],values:{}},rec:true,fromPay:true};
- const b={id:uid('b'),sid:s.id,month:S.month,amount:899,due:'14 '+mshort(S.month),status:'paid',paidBy:{me:899},paidOn:'14 '+mshort(S.month),split:clone(s.split)};
- c.series.push(s);c.bills.push(b);const sh=shareMap(899,s.split);c.hist.push({t:'You paid ₹899 · Jio recharge',d:'14 '+mshort(S.month)+' · fetched from your payment',r:'You will get',rv:rs(899-(sh.me||0))})}
+ toast(f.src==='payment'?'Circle created · your electricity bill is already in it':'Circle created · add your first bill');runSuggest(c.id)};
+function addPaymentBill(c){const s={id:uid('s'),cat:'electricity',biller:'BESCOM',consumer:'1234 5678 90',label:'Electricity Bill',split:{mode:'equal',members:c.members.slice(),values:{}},rec:true,fromPay:true};
+ const b={id:uid('b'),sid:s.id,month:S.month,amount:1840,due:'20 '+mshort(S.month),status:'paid',paidBy:{me:1840},paidOn:'14 '+mshort(S.month),split:clone(s.split)};
+ c.series.push(s);c.bills.push(b);const sh=shareMap(1840,s.split);c.hist.push({t:'You paid ₹1,840 · Electricity',d:'14 '+mshort(S.month)+' · fetched from your payment',r:'You will get',rv:rs(1840-(sh.me||0))})}
 ACT.tab=v=>{top().p.tab=v;render(true)};
 ACT.share=()=>toast('Invite link copied · share it on WhatsApp');
 ACT.settings=()=>sheet('settings',{cid:top().p.id});
 ACT.addMember=()=>{T.flow={mode:'addmember',cid:top().p.id,sel:[]};SHEET=null;go('select')};
 ACT.pickSeries=id=>{const i=T.pick.indexOf(id);if(i>=0)T.pick.splice(i,1);else T.pick.push(id);render()};
 ACT.addToBillsGo=()=>{const p=SHEET.p;const c=circ(p.cid);let custom=0;T.pick.forEach(sid=>{const s=c.series.find(x=>x.id===sid);p.mem.forEach(m=>addToSeries(c,s,m))});save();SHEET=null;render();toast('Added to '+T.pick.length+' bill'+(T.pick.length===1?'':'s')+' · repeats monthly')};
-function addToSeries(c,s,m){if(s.cat==='mobile')return;if(s.split.mode==='equal'){if(!s.split.members.includes(m))s.split.members.push(m)}else{s.split={mode:'equal',members:[...new Set(splitMembers(s.split).concat(m))],values:{}}}
+function addToSeries(c,s,m){if(s.split.mode==='equal'){if(!s.split.members.includes(m))s.split.members.push(m)}else{s.split={mode:'equal',members:[...new Set(splitMembers(s.split).concat(m))],values:{}}}
  applySeries(c,s)}
 function applySeries(c,s){const lb=latestBill(c,s.id);if(lb)c.bills.filter(b=>b.sid===s.id&&b.month>=lb.month).forEach(b=>b.split=clone(s.split))}
 ACT.addOne=v=>{const [sid,m]=v.split('|');sheet('addOne',{cid:top().p.id,sid,m})};
@@ -745,11 +744,11 @@ ACT.payConfirm=id=>{const c=circ(top().p.id);const b=c.bills.find(x=>x.id===id);
  go('done',{t:'Bill Paid !',s:rs(b.amount)+' · '+s.label,r:'',o:b.saved?'₹'+b.saved+' saved':''})};
 /* add bill */
 ACT.addBill=()=>{T.draft={cid:top().p.id};go('cats')};
-ACT.pickCat=k=>{const c=circ(T.draft.cid);const base={cid:c.id,cat:k,rec:true,split:{mode:'equal',members:k==='mobile'?['me']:c.members.slice(),values:{}},splitChosen:false};
+ACT.pickCat=k=>{const c=circ(T.draft.cid);const base={cid:c.id,cat:k,rec:true,split:{mode:'equal',members:c.members.slice(),values:{}},splitChosen:false};
  if(k==='other'){T.draft=Object.assign(base,{amount:0,label:'',payer:'me',paidBy:null});go('amount')}
  else{T.draft=Object.assign(base,{biller:CATS[k].b[0],consumer:CATS[k].v,fetched:false,payer:null});go('fetch')}};
 ACT.pickBiller=b=>{T.draft.biller=b;T.draft.fetched=false;render()};
-ACT.fetchBill=()=>{const d=T.draft;if(!String(d.consumer).trim()){toast('Enter '+CATS[d.cat].f);return}const k=CATS[d.cat];d.amount=k.a;d.due=(d.cat==='mobile'||d.cat==='lpg'||d.cat==='dth'?'Today':'20 '+mshort(S.month));if(d.due==='Today')d.due=today();d.fetched=true;render()};
+ACT.fetchBill=()=>{const d=T.draft;if(!String(d.consumer).trim()){toast('Enter '+CATS[d.cat].f);return}const k=CATS[d.cat];d.amount=k.a;d.due=(d.cat==='lpg'||d.cat==='dth'?'Today':'20 '+mshort(S.month));if(d.due==='Today')d.due=today();d.fetched=true;render()};
 ACT.toAmount=()=>go('amount');
 ACT.toggleRep=()=>{T.draft.rec=!T.draft.rec;render()};
 ACT.whoPaid=()=>{if(!(T.draft.amount>0)&&T.draft.cat==='other'){toast('Enter the amount first');return}sheet('whoPaid')};
@@ -766,7 +765,7 @@ function openHS(ctx,p){let sp,amount,all;
  else{const c=circ(p.cid);const s=c.series.find(x=>x.id===p.sid);sp=s.split;const lb=latestBill(c,s.id);amount=lb?lb.amount:0;all=c.members}
  T.hs={mode:sp.mode,members:splitMembers(sp),values:Object.assign({},sp.values||{}),amount,all:all.slice()};
  if(p.addm){T.hs.values[p.addm]='';}
- T.hs.single=(ctx==='draft'?T.draft.cat:circ(p.cid).series.find(x=>x.id===p.sid).cat)==='mobile';
+ T.hs.single=false;
  if(T.hs.single){T.hs.mode='equal';T.hs.members=T.hs.members.slice(0,1);if(!T.hs.members.length)T.hs.members=['me']}
  go('howsplit',Object.assign({ctx},p))}
 ACT.hsMode=m=>{const h=T.hs;if(h.mode===m)return;const cur=splitMembers({mode:h.mode,members:h.members,values:h.values});const mem=cur.length?cur:h.all.slice();
@@ -808,8 +807,8 @@ app.addEventListener('input',e=>{const el=e.target;const a=el.dataset.in;if(a&&I
 
 /* demo controls + system nav */
 function nextMonthBills(){S.month=nextMonth(S.month);let n=0;
- S.circles.forEach(c=>{c.series.filter(s=>s.rec).forEach(s=>{const lb=latestBill(c,s.id);if(!lb)return;const amt=s.cat==='mobile'||s.cat==='dth'?lb.amount:s.cat==='other'?lb.amount:Math.round(lb.amount*(0.9+Math.random()*0.2));
-  c.bills.push({id:uid('b'),sid:s.id,month:S.month,amount:amt,due:(s.cat==='mobile'?'14 ':'20 ')+mshort(S.month),status:'due',paidBy:null,paidOn:'',split:clone(s.split)});n++});
+ S.circles.forEach(c=>{c.series.filter(s=>s.rec).forEach(s=>{const lb=latestBill(c,s.id);if(!lb)return;const amt=s.cat==='dth'?lb.amount:s.cat==='other'?lb.amount:Math.round(lb.amount*(0.9+Math.random()*0.2));
+  c.bills.push({id:uid('b'),sid:s.id,month:S.month,amount:amt,due:'20 '+mshort(S.month),status:'due',paidBy:null,paidOn:'',split:clone(s.split)});n++});
   if(c.series.some(s=>s.rec))c.hist.push({t:MONL[+S.month.split('-')[1]-1]+' bills fetched',d:today()+' · split the same way as last month'})});
  save();return n}
 document.getElementById('demo').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;const d=b.dataset.d;
