@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Paytm Circle Prototype v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#004299;--bg:#F5F5F5;--ink:#282828;--ink2:#555;--ink3:#8A8A8A;--line:#EBEBEB;--radio:#CBCBCB;--link:#2074CA;--chk:#1577DC;--cyan:#00B8F6;--sky:#E1F5FE;--green:#15883A;--red:#D9343F;--logo:#072966;--orange:#F19F18;--band:#F2F6FA}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:Inter,system-ui,-apple-system,sans-serif;background:#DDE4EE;color:var(--ink);display:flex;align-items:center;justify-content:center;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:inherit}
+input{font:inherit;color:inherit;border:0;outline:0;background:none;min-width:0}
+#stage{display:flex;gap:36px;align-items:center}
+#phone{width:360px;height:785px;background:#fff;border-radius:30px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 0 0 9px #16181d,0 24px 60px rgba(0,0,0,.35);transform-origin:center}
+#sbar{height:37px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 26px;font-size:13.5px;font-weight:600;background:#fff;transition:background .2s}
+#sbar .r{display:flex;gap:6px;align-items:center}
+#app{flex:1;position:relative;overflow:hidden;background:#fff}
+#nbar{height:45px;flex:none;display:flex;justify-content:space-between;align-items:center;background:#fff;color:#8a8a8a;padding:0 76px}
+#nbar button{display:grid;place-items:center;width:40px;height:40px}
+#demo{width:250px;font-size:13px;color:#33415c;line-height:1.45}
+#demo h3{font-size:15px;margin-bottom:6px;color:#0b1b3a}
+#demo p{margin-bottom:12px}
+#demo button{display:block;width:100%;text-align:left;background:#fff;border:1px solid #c9d3e3;border-radius:10px;padding:9px 12px;margin-bottom:8px;font-weight:600;color:#0b2a6b}
+#demo button:hover{border-color:var(--navy)}
+@media (max-width:640px){
+  body{background:#fff;display:block}
+  #stage{display:block}
+  #phone{width:100vw;height:100vh;height:100dvh;border-radius:0;box-shadow:none;transform:none!important}
+  #sbar,#nbar,#demo{display:none}
+}
+/* generic */
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+.scr.w{background:#fff}
+.body{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;position:relative}
+.body::-webkit-scrollbar{display:none}
+.hdr{height:56px;flex:none;display:flex;align-items:center;padding:0 4px}
+.ib{width:48px;height:48px;display:grid;place-items:center;border-radius:50%;flex:none}
+.sp{flex:1}
+.h1{font-size:30.5px;font-weight:700;line-height:37px;letter-spacing:-.2px;padding:0 12px}
+.card{background:#fff;border-radius:20px;margin:0 12px}
+.btn{height:52px;border-radius:26px;background:var(--navy);color:#fff;font-weight:700;font-size:15.5px;width:100%;text-align:center;letter-spacing:-.1px;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.ghost{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+.foot{flex:none;background:#fff;padding:16px 12px 20px;border-top:1px solid var(--line)}
+.foot.nb{border-top:0}
+.lnk{color:var(--link);font-weight:600}
+.av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:16px;flex:none;position:relative;letter-spacing:-.2px}
+.av.s{width:34px;height:34px;font-size:12.5px}
+.av.m{width:40px;height:40px;font-size:14px}
+.rad{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--radio);flex:none;display:grid;place-items:center}
+.rad.on{border:0;background:var(--chk)}
+.rad.lg{width:24px;height:24px;border:2px solid #757575}
+.rad.lg.on{border:0}
+.cb{width:22px;height:22px;border:2px solid var(--chk);border-radius:3px;flex:none;display:grid;place-items:center}
+.cb.off{border-color:#9AA4B2}
+.list .row{display:flex;align-items:center;padding-left:16px}
+.list .row .av{margin-right:12px}
+.list .tx{flex:1;display:flex;align-items:center;min-height:72px;border-bottom:1px solid var(--line);padding-right:18px;gap:10px}
+.list .row:last-child .tx{border-bottom:0}
+.list .nm{flex:1;min-width:0}
+.list .n1{font-size:14.5px;line-height:20px}
+.list .n2{font-size:12px;color:#505050;margin-top:3px}
+.list .n1.big{font-size:16px}
+/* toast + sheet */
+#toast{position:absolute;left:50%;bottom:96px;transform:translate(-50%,20px);background:#1f2633;color:#fff;font-size:13.5px;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;width:max-content;max-width:300px;text-align:center;z-index:60}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.ov{position:absolute;inset:0;background:rgba(0,0,0,.7);z-index:40;animation:fd .2s}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;z-index:41;max-height:88%;display:flex;flex-direction:column;animation:up .22s ease-out}
+.sheet .sh-h{display:flex;align-items:center;padding:20px 16px 8px}
+.sheet .sh-t{flex:1;font-size:19.5px;font-weight:700}
+.sheet .sh-b{overflow-y:auto;flex:1}
+.sheet .sh-f{padding:14px 16px 20px}
+.xbtn{width:24px;height:24px;border-radius:50%;background:#6F6F6F;display:grid;place-items:center}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fd{from{opacity:0}to{opacity:1}}
+/* paytm logo */
+.logo{font-family:Inter,sans-serif;font-weight:900;font-size:31px;letter-spacing:-1.4px;color:var(--logo);line-height:1;font-style:normal;transform:scaleY(1.08)}
+.logo span{color:var(--cyan)}
+/* ---------- HOME ---------- */
+.h-top{display:flex;align-items:center;padding:12px 8px 0 12px;gap:8px}
+.av-as{width:44px;height:44px;border-radius:50%;background:#F0D5F6;color:#9A3FB1;display:grid;place-items:center;font-size:16px;font-weight:500}
+.gold{font-size:12.5px;font-weight:600;line-height:16px;margin-left:12px}
+.gold b{font-weight:800}
+.gold-go{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#1A73E8;vertical-align:-2px;margin-left:2px}
+.banner{position:relative;height:150px;padding:30px 0 0 38px}
+.bn-t{font-size:15px;line-height:18px;font-weight:500;width:178px}
+.bn-b{margin-top:10px;background:var(--navy);color:#fff;font-size:13px;font-weight:600;height:25px;border-radius:13px;padding:0 12px}
+.bn-art{position:absolute;right:46px;top:16px}
+.dots{position:absolute;left:170px;bottom:10px;display:flex;gap:4px}
+.dots i{width:6px;height:6px;border-radius:50%;background:#e2e2e2}.dots i.on{background:#333}
+.tnc{position:absolute;right:18px;bottom:8px;font-size:7px;color:#666}
+.home h2{font-size:20px;font-weight:700}
+.upi{padding:20px 16px 18px;margin-top:8px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);margin-top:20px}
+.u{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;line-height:15px;text-align:center;color:#333}
+.uc{width:48px;height:48px;border-radius:50%;background:var(--navy);display:grid;place-items:center}
+.rb{margin-top:17px;padding:20px 0 14px}
+.rb-h{display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.va{display:flex;align-items:center;gap:6px;color:var(--link);font-size:15px;font-weight:500}
+.tiles{display:flex;overflow-x:auto;scrollbar-width:none;padding:22px 0 0 6px;scroll-snap-type:x proximity}
+.tiles::-webkit-scrollbar{display:none}
+.t{flex:none;width:88px;display:flex;flex-direction:column;align-items:center;gap:9px;font-size:12px;line-height:15px;color:#3a3a3a;text-align:center;position:relative;scroll-snap-align:start}
+.ti{width:46px;height:46px;display:grid;place-items:center;border-radius:14px}
+.t-circle .ti{background:var(--sky);box-shadow:inset 0 0 0 1px #BFE8FB}
+.t-circle .tl{color:var(--navy);font-weight:600}
+.t em{position:absolute;top:37px;left:50%;transform:translateX(-50%);font-style:normal;font-size:10px;font-weight:600;color:#111;background:#FFD766;border:1px solid #F5BE1E;border-radius:7px;padding:0 8px;line-height:13px;white-space:nowrap}
+.ind{height:5px;width:27px;border-radius:3px;background:#E7E7E7;margin:20px auto 0;position:relative;overflow:hidden}
+.ind i{position:absolute;top:0;bottom:0;left:0;width:55%;border-radius:3px;background:#6E6E6E}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:19px 12px 0}
+.g2 .c{background:#fff;border-radius:20px;padding:16px}
+.g2 .tall{grid-row:span 2;display:flex;flex-direction:column;justify-content:space-between;min-height:130px}
+.g2 .small{display:flex;align-items:center;gap:12px;font-size:16px;min-height:62px}
+.g2 .pp1{font-size:16px}.g2 .pp2{font-size:13px;color:#777;margin-top:3px;line-height:15px}
+.scanqr{position:absolute;left:50%;transform:translateX(-50%);bottom:15px;width:162px;height:56px;border-radius:28px;background:linear-gradient(180deg,#1F5FC7,#062F78);color:#fff;font-size:19px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 0 0 1.5px #5D8FE0 inset,0 6px 16px rgba(0,40,110,.3)}
+/* ---------- PAY ANYONE ---------- */
+.pa-help{display:flex;align-items:center;gap:6px;font-size:15px;color:#333}
+.pa-t{font-size:33px;font-weight:700;letter-spacing:-.4px;padding:4px 12px 0;line-height:40px}
+.pa-s{display:flex;align-items:center;gap:10px;font-size:14px;color:#333;padding:6px 12px 0}
+.pa-sr{display:flex;align-items:center;gap:12px;padding:24px 12px 0}
+.pa-in{flex:1;height:55px;border-radius:28px;border:1.5px solid #C5D3E8;display:flex;align-items:center;padding:0 16px;font-size:15.5px;color:#7A7A7A;white-space:nowrap;overflow:hidden}
+.pa-ct{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12.5px;color:#333;width:60px}
+.pa-h{font-size:20px;font-weight:700;padding:30px 12px 0;display:flex;justify-content:space-between;align-items:center}
+.pa-g{margin-top:18px;display:grid;grid-template-columns:repeat(4,1fr);row-gap:20px;padding:16px 4px 18px}
+.pa-p{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:13px;line-height:16px;text-align:center;color:#222}
+.av.xl{width:64px;height:64px;font-size:19px}
+.pa-chips{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:16px 12px 0}
+.pa-chips::-webkit-scrollbar{display:none}
+.pa-c{flex:none;height:36px;border-radius:18px;background:#fff;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:14px;color:#222;white-space:nowrap}
+.pa-ft{flex:none;height:30px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:10px;color:#777;background:var(--bg)}
+/* ---------- AI SUGGESTION ---------- */
+.ai{background:linear-gradient(135deg,#EAF6FF 0%,#F3F0FF 100%);border:1px solid #CFE3FA;border-radius:16px;padding:12px 14px 12px;margin-top:18px;position:relative}
+.ai-h{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#004299;letter-spacing:.3px;text-transform:uppercase}
+.ai p{font-size:13.5px;line-height:19px;margin-top:6px;color:#222}
+.ai p b{font-weight:700}
+.ai .ab{margin-top:10px;height:34px;border-radius:17px;background:var(--navy);color:#fff;font-size:13px;font-weight:700;padding:0 14px;display:inline-flex;align-items:center;gap:6px}
+.ai small{display:block;font-size:10.5px;color:#6b7280;margin-top:8px}
+.ai .ax{position:absolute;top:8px;right:8px;width:26px;height:26px;display:grid;place-items:center;border-radius:50%}
+.ai-r{display:flex;align-items:center;gap:8px;font-size:15px;padding-right:26px}
+.ai-r2{display:flex;align-items:center;gap:10px;margin-top:10px}
+.ai-r2 .ab{margin-top:0}
+.offp{display:inline-block;background:#FFD766;border:1px solid #F5BE1E;color:#111;font-size:11px;font-weight:600;border-radius:8px;padding:1px 8px;white-space:nowrap}
+.pl{font-size:12px;font-weight:600;margin-top:3px}.pl.ok{color:#15883A}.pl.due{color:#D9343F}
+/* ---------- PAYMENT SUCCESS ---------- */
+.sc-card{margin:8px 16px 0;border-radius:16px;overflow:hidden;background:var(--sky)}
+.sc-in{padding:26px 16px 32px}
+.sc-t{font-size:17px;font-weight:700;display:flex;align-items:center;gap:7px}
+.sc-d{font-size:14px;margin-top:6px}
+.sc-d a{color:var(--cyan);font-weight:500}
+.sc-op{display:flex;gap:12px;margin-top:24px;font-size:14px;line-height:20px}
+.jio{width:40px;height:40px;border-radius:50%;background:#0F3CC9;color:#fff;font-weight:800;font-style:italic;display:grid;place-items:center;font-size:15px;letter-spacing:-.5px;flex:none}
+.dash{border-top:2px dashed #8E8E8E;margin:24px 0 18px;opacity:.7}
+.note{font-size:14px;line-height:26px}
+.note b{color:var(--orange);font-weight:600}
+.sc-btns{display:flex;gap:9px;margin:24px -16px 0 0;overflow-x:auto;scrollbar-width:none;padding-right:16px}
+.sc-btns::-webkit-scrollbar{display:none}
+.pb{flex:none;height:38px;border-radius:19px;padding:0 17px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.pb.f{background:var(--cyan);color:#fff}
+.pb.o{border:1.5px solid var(--cyan);color:var(--cyan);background:transparent}
+.scratch{height:54px;background:linear-gradient(90deg,#2B176F,#5B2BC9 55%,#A464F7);border-top:7px solid var(--cyan);box-shadow:inset 0 7px 0 #0B2A73;display:flex;align-items:center;padding-left:84px;color:#fff;font-weight:800;font-size:12px;letter-spacing:2px;white-space:nowrap;overflow:hidden;position:relative}
+.scratch .sw{position:absolute;left:12px;bottom:-4px;width:56px;height:68px;border-radius:9px;background:linear-gradient(160deg,#F25FB3,#7B2FD8);transform:rotate(-12deg);display:grid;place-items:center;font-size:11px;letter-spacing:0;font-style:italic;box-shadow:0 0 0 2px #fff}
+.goldb{margin:24px 12px 0;height:48px;border-radius:24px;background:linear-gradient(90deg,#FFF3D6,#FFFBF1);display:flex;align-items:center;padding:0 10px 0 14px;gap:10px}
+.goldb .coin{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE38A,#E2A821);flex:none}
+.goldb .gt{flex:1;color:#E59A1E;font-weight:700;font-size:12.5px;line-height:15px}
+.goldb .gp{background:#0A2A7A;color:#fff;border-radius:14px;height:24px;padding:0 10px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:4px}
+.rdone{margin:32px 12px 0;border-radius:24px;background:linear-gradient(120deg,#E6F4FF,#F7FBFF);padding:22px 18px;min-height:110px}
+.rdone .g{color:#1E8E4A;font-weight:600;font-size:13.5px}
+.rdone .b{font-size:14px;margin-top:6px}
+.bnav{position:absolute;left:29px;right:29px;bottom:29px;height:63px;border-radius:32px;background:#002A90;display:flex;justify-content:space-around;align-items:center;color:#fff}
+.bnav button{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12.5px}
+/* ---------- ONBOARD ---------- */
+.ob-h{height:68px;position:relative;justify-content:space-between}
+.ob-mid{text-align:center;line-height:1}
+.ob-sub{font-size:17px;font-weight:800;color:#0A3A8C;letter-spacing:-.4px;margin-top:4px}
+.prog{display:flex;gap:4px;padding:2px 16px 0}
+.prog i{flex:1;height:3px;border-radius:2px;background:#EBEBEB;position:relative;overflow:hidden}
+.prog i b{position:absolute;inset:0;width:0;background:var(--navy);border-radius:2px}
+.prog i.done b{width:100%}
+.prog i.cur b{animation:fill 3.6s linear forwards}
+@keyframes fill{to{width:100%}}
+.ob-art{margin-top:35px;height:320px;background-color:#fff;background-image:repeating-linear-gradient(90deg,rgba(0,140,255,.07) 0 22px,transparent 22px 44px),repeating-linear-gradient(0deg,rgba(0,140,255,.07) 0 22px,transparent 22px 44px);display:grid;place-items:center}
+.ob-t{font-size:29.5px;font-weight:700;text-align:center;line-height:40px;letter-spacing:-.2px;padding:0 40px;margin-top:62px}
+/* ---------- SELECT ---------- */
+.srch{margin:20px 12px 0;height:48px;border-radius:24px;background:#fff;display:flex;align-items:center;gap:10px;padding:0 14px}
+.srch input{flex:1;font-size:15.5px}
+.srch input::placeholder{color:#737373}
+.srch.ol{margin:0;flex:1;border:1.5px solid #0D3F8F;margin-right:12px;padding:0 10px;gap:8px}.srch.ol input{font-size:14.5px}
+.chips{display:flex;flex-wrap:wrap;padding:12px 0 10px}
+.chip{width:88px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:13.5px;line-height:16px;text-align:center;padding-bottom:6px}
+.chip .x{position:absolute;top:-2px;right:-6px;width:14px;height:14px;border-radius:50%;background:#757575;display:grid;place-items:center;box-shadow:0 0 0 1.5px #fff}
+.addm .av{background:#F4F6F8;border:1.5px dashed #C9CACC}
+/* ---------- DETAILS ---------- */
+.dcard{margin:20px 12px 0;padding:16px;display:flex;align-items:center;gap:17px}
+.cic{width:48px;height:48px;border-radius:50%;background:#FFE8E8;display:grid;place-items:center;flex:none}
+.fld{flex:1;position:relative;border:1.5px solid #0D3F8F;border-radius:12px;height:48px;display:flex;align-items:center;padding:0 12px}
+.fld label{position:absolute;top:-10px;left:10px;background:#fff;padding:0 4px;font-size:14px;color:#555}
+.fld input{font-size:15.5px;width:100%}
+.sec{font-size:17.5px;font-weight:700;padding:36px 28px 14px}
+/* ---------- CIRCLE ---------- */
+.c-head{flex:none;background:linear-gradient(150deg,#FFF3EA 0%,#FCE1D2 45%,#FFF0DA 100%);padding-bottom:16px}
+.c-top{display:flex;align-items:center;height:56px;padding:0 8px 0 4px;gap:16px}
+.c-top .ac{display:flex;align-items:center;gap:7px;font-size:15px;color:#333}
+.c-title{font-size:30.5px;font-weight:700;letter-spacing:-.3px;line-height:36px;padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bal{margin:15px 8px 0;background:#fff;border-radius:24px;border:1px solid #D6E0EE;display:flex;padding:16px 16px 14px;box-shadow:0 2px 6px rgba(0,30,80,.06)}
+.bal>div{flex:1}
+.bal .l{font-size:13px;color:#3d3d3d}
+.bal .v{font-size:23px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:9px;letter-spacing:-.5px}
+.bal .r{text-align:right;border-left:1px solid #DCE3EC;margin:4px 0}
+.bal .r .v{justify-content:flex-end}
+.bdg{width:20px;height:20px;border-radius:50%;display:grid;place-items:center}
+.tabs{display:flex;gap:8px;padding:14px 12px 4px;flex:none;background:var(--bg)}
+.tab{height:36px;border-radius:18px;padding:0 20px;border:1.5px solid #E3E3E3;background:#fff;font-size:14.5px;display:flex;align-items:center;gap:8px}
+.tab.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+.tab .cnt{font-size:12px;background:#E9EEF5;color:#333;border-radius:9px;padding:1px 7px;font-weight:600}
+.tab.on .cnt{background:rgba(255,255,255,.2);color:#fff}
+.mcard{margin:12px 12px 0;background:#fff;border-radius:20px;overflow:hidden}
+.mhd{background:var(--band);padding:16px 16px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.mhd small{font-size:12.5px;font-weight:500;color:#666}
+.brow{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);width:100%}
+.brow:last-child{border-bottom:0}
+.bic{width:42px;height:42px;border-radius:50%;background:var(--sky);display:grid;place-items:center;flex:none}
+.bt{flex:1;min-width:0}
+.bt1{font-size:14.5px}
+.bt2{font-size:12.5px;color:#666;margin-top:3px;line-height:16px}
+.bamt{text-align:right;font-size:14.5px;font-weight:600}
+.paid{color:var(--green);font-size:12px;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:3px;justify-content:flex-end}
+.pay{margin-top:5px;background:var(--navy);color:#fff;font-size:12.5px;font-weight:700;height:26px;border-radius:13px;padding:0 14px}
+.h2s{font-size:21px;font-weight:700;padding:26px 16px 0}
+.hrow{display:flex;justify-content:space-between;padding:16px 0;margin:0 16px;border-bottom:1px solid #E0E0E0;gap:10px}
+.hrow:last-child{border-bottom:0}
+.hrow .a{font-size:15.5px;line-height:21px}
+.hrow .b{font-size:13px;color:#555;margin-top:4px}
+.hrow .c{text-align:right;font-size:12.5px;color:#555;flex:none}
+.hrow .c b{display:block;font-size:14.5px;margin-top:3px}
+.fab{position:absolute;left:50%;transform:translateX(-50%);bottom:24px;height:52px;border-radius:26px;background:var(--navy);color:#fff;font-size:16.5px;font-weight:700;padding:0 26px 0 18px;display:flex;align-items:center;gap:12px;letter-spacing:-.2px;box-shadow:0 6px 16px rgba(0,50,120,.25);white-space:nowrap}
+.empty{margin:12px;background:#fff;border-radius:20px;padding:28px 22px;text-align:center}
+.empty .ei{width:64px;height:64px;border-radius:50%;background:var(--sky);display:grid;place-items:center;margin:0 auto 14px}
+.empty h4{font-size:17px;letter-spacing:-.2px}
+.empty p{font-size:13.5px;color:#666;line-height:19px;margin-top:6px}
+.srow{display:flex;align-items:center;gap:12px;padding:14px 16px 0}
+.sact{display:flex;justify-content:center;gap:10px;align-items:center;font-size:13.5px;font-weight:600;color:#333;padding:10px 0 14px;border-bottom:1px solid var(--line);margin:0 16px}
+.sact i{width:4px;height:4px;border-radius:50%;background:#BDBDBD}
+.sact:last-child{border-bottom:0}
+.scard{margin:12px 12px 0;background:#fff;border-radius:20px;padding:16px 0 8px}
+.shd{display:flex;align-items:center;gap:12px;padding:0 16px 10px}
+.edit{display:flex;align-items:center;gap:5px;color:var(--link);font-weight:600;font-size:14px;border:1.5px solid #C9DDF5;background:#EEF5FE;border-radius:16px;height:32px;padding:0 12px}
+.mrow{display:flex;align-items:center;gap:12px;padding:8px 16px}
+.mrow .nm{flex:1;font-size:14px}
+.mrow .am{font-size:14px;font-weight:600}
+.mrow.out .av,.mrow.out .nm{opacity:.5}
+.addp{color:var(--link);font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:3px;opacity:1}
+.mrow.out .nm{color:#555}
+.pill{display:inline-block;font-size:11.5px;background:#EEF5FE;color:#245DA8;border-radius:10px;padding:2px 8px;font-weight:600;margin-top:5px}
+/* ---------- AMOUNT ---------- */
+.amt-top{display:flex;align-items:center;height:56px;padding:0 4px;position:relative}
+.amt-top .cic{position:absolute;left:50%;transform:translateX(-50%);background:#FFEDE3}
+.amt-t{font-size:26px;font-weight:700;letter-spacing:-.3px;text-align:center;margin-top:16px;padding:0 20px}
+.amt-l{text-align:center;font-size:13.5px;margin-top:30px;color:#333}
+.amt-v{display:flex;justify-content:center;align-items:flex-start;margin-top:8px;height:88px}
+.amt-v .rs{font-size:40px;font-weight:300;margin-top:6px;color:#333}
+.amt-v input{font-size:84px;font-weight:700;letter-spacing:-3px;width:1ch;text-align:left;line-height:88px;color:var(--ink)}
+.amt-v input:placeholder-shown,.amt-v .z{color:#C7C7C7}
+.amt-v .fx{font-size:84px;font-weight:700;letter-spacing:-3px;line-height:88px}
+.dpill{margin:28px auto 0;border:1.5px dashed #9E9E9E;border-radius:22px;height:36px;padding:0 12px;display:flex;align-items:center;width:max-content;max-width:320px;font-size:14px;color:#6F6F6F}
+.dpill input{font-size:14.5px;width:200px;text-align:center}
+.fetched{text-align:center;font-size:12.5px;color:var(--green);margin-top:10px;font-weight:600}
+.rep{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13.5px;color:#444;padding:0 0 14px}
+.sw{width:36px;height:20px;border-radius:10px;background:#C9C9C9;position:relative;transition:.2s;flex:none}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--navy)}.sw.on::after{left:18px}
+.pbar{display:flex;align-items:center;justify-content:center;gap:10px;padding:0 0 22px}
+.pbar .lb{font-size:14px;color:#757575}
+.pchip{height:36px;border:1.5px solid #DCE6F2;border-radius:18px;display:flex;align-items:center;gap:8px;padding:0 10px 0 1px;font-size:15px;background:#fff}
+.pchip.np{padding-left:12px;font-size:14px}
+.later{display:block;margin:14px auto 0;color:var(--link);font-weight:600;font-size:15.5px;text-align:center}
+/* ---------- HOW TO SPLIT ---------- */
+.hs-h{font-size:18px;font-weight:700}
+.mchips{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding:8px 12px 0;flex:none}
+.mchips::-webkit-scrollbar{display:none}
+.mc{flex:none;height:36px;border-radius:18px;border:1.5px solid #E3E3E3;background:#fff;display:flex;align-items:center;gap:8px;padding:0 16px 0 12px;font-size:14.5px;color:#333}
+.mc.on{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700}
+.hcard{margin:17px 12px 0;background:#fff;border-radius:20px;padding:20px 0 6px;min-height:100%}
+.hct{font-size:15.5px;font-weight:700;padding:0 16px}
+.hcs{font-size:13.5px;color:#333;padding:2px 16px 10px}
+.vin{width:86px;height:46px;border:1.5px solid #8A8A8A;border-radius:12px;text-align:center;font-size:16px;color:var(--ink)}
+.vin::placeholder{color:#999}
+.hfoot{display:flex;justify-content:space-between;align-items:center;padding:4px 12px 16px}
+.hfoot .a{font-size:15px}
+.hfoot .b{font-size:14px;color:#707070;margin-top:3px}
+.hfoot .sa{display:flex;align-items:center;gap:10px;font-size:14.5px}
+.warn{color:var(--red)!important}
+.apnote{font-size:12.5px;color:#245DA8;background:#EEF5FE;border-radius:10px;padding:8px 12px;margin:0 0 12px;display:flex;gap:6px;align-items:center}
+/* ---------- DONE ---------- */
+.done{background:radial-gradient(circle at 50% 38%,#6CB585 0%,#3F9A5C 30%,#15883A 62%);color:#fff;align-items:center;justify-content:center;text-align:center}
+.done .ck{width:80px;height:80px;border-radius:50%;background:#178A3C;display:grid;place-items:center;margin-top:-120px}
+.done h3{font-size:19.5px;font-weight:700;margin-top:28px}
+.done .s{font-size:14.5px;margin-top:6px}
+.done .n{font-size:14.5px;margin-top:38px;display:flex;align-items:center;gap:10px}
+.done .r{font-size:13px;margin-top:14px;opacity:.9;display:flex;align-items:center;gap:6px}
+/* ---------- FETCH / CATS ---------- */
+.ctiles{display:grid;grid-template-columns:repeat(4,1fr);row-gap:20px;padding:20px 4px}
+.brl .row{min-height:52px}
+.binfo{margin:16px 12px 0;background:var(--sky);border-radius:16px;padding:16px}
+.binfo .r{display:flex;justify-content:space-between;font-size:14px;padding:5px 0}
+.binfo .r b{font-weight:600}
+.lbl{font-size:13px;color:#666;padding:16px 16px 6px;font-weight:500}
+.multi{margin:4px 16px 0;background:#F4F8FB;border-radius:20px 20px 0 0;display:flex;align-items:center;padding:12px 16px;gap:12px;font-size:16px}
+.stack{display:flex}.stack .av{margin-right:-10px;box-shadow:0 0 0 2px #F4F8FB}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="phone">
+    <div id="sbar"><span id="clock">12:22</span><span class="r">
+      <svg width="16" height="12" viewBox="0 0 16 12"><path d="M1 11h2V8H1zm4 0h2V6H5zm4 0h2V3H9zm4 0h2V0h-2z" fill="#222"/></svg>
+      <svg width="16" height="12" viewBox="0 0 24 18" fill="none" stroke="#222" stroke-width="2.4" stroke-linecap="round"><path d="M2 6a15 15 0 0 1 20 0M5.5 9.5a10 10 0 0 1 13 0M9 13a5 5 0 0 1 6 0"/></svg>
+      <span style="background:#222;color:#fff;border-radius:4px;font-size:10px;padding:0 4px;line-height:14px">71</span></span></div>
+    <div id="app"></div>
+    <div id="nbar">
+      <button aria-label="Recent apps"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <button aria-label="Home" data-sys="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.6"><rect x="5" y="5" width="14" height="14" rx="3"/></svg></button>
+      <button aria-label="Back" data-sys="back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.6" stroke-linejoin="round"><path d="M18 5v14L7 12z"/></svg></button>
+    </div>
+  </div>
+  <aside id="demo">
+    <h3>Prototype controls</h3>
+    <p>Two ways into the Circle: <b>Home → Recharge &amp; Bills → Add your Circle</b>, or <b>Mobile Recharge → payment success → Add your Circle</b> (the recharge bill comes into the circle already fetched). v3: short bill suggestions, flat ₹25–₹50 off for each new bill type, one person per mobile recharge, and who paid on the Split tab.</p>
+    <button data-d="home">Open Home</button>
+    <button data-d="pay">Open payment success</button>
+    <button data-d="month">Simulate next month's bills</button>
+    <button data-d="reset">Reset demo data</button>
+    <p style="margin-top:10px;color:#6b7a93">Sample data only. Data is saved in this browser.</p>
+  </aside>
+</div>
+
+<script>
+(function(){
+/* ================= ICONS ================= */
+const P={
+back:'<path d="M20 12H4.5M10.5 5.5 4 12l6.5 6.5"/>',
+search:'<circle cx="11" cy="11" r="7.2"/><path d="m16.4 16.4 4.3 4.3"/>',
+bell:'<path d="M6 17v-6a6 6 0 0 1 12 0v6l1.6 1.6H4.4z"/><path d="M10 21.2h4"/>',
+bellr:'<path d="M6.5 17v-5.5a5.5 5.5 0 0 1 11 0V17l1.5 1.5H5z"/><path d="M10 21h4M4 6.5 5.8 4.8M20 6.5l-1.8-1.7"/>',
+scan:'<path d="M3 8V5.5A2.5 2.5 0 0 1 5.5 3H8M16 3h2.5A2.5 2.5 0 0 1 21 5.5V8M21 16v2.5a2.5 2.5 0 0 1-2.5 2.5H16M8 21H5.5A2.5 2.5 0 0 1 3 18.5V16"/><rect x="7" y="7" width="4" height="4" rx="1"/><rect x="13" y="7" width="4" height="4" rx="1"/><rect x="7" y="13" width="4" height="4" rx="1"/><rect x="13" y="13" width="4" height="4" rx="1"/>',
+payany:'<rect x="5" y="3" width="13" height="18" rx="2.2"/><path d="M15 10V5.5m0 0-2 2m2-2 2 2"/><circle cx="10.5" cy="12" r="2"/><path d="M7.5 17c.5-1.6 1.6-2.5 3-2.5s2.5.9 3 2.5"/>',
+bank:'<path d="M3 9.5 12 4l9 5.5M5 10.5v7M9.5 10.5v7M14.5 10.5v7M19 10.5v7M3 20h18"/>',
+doc:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+phone:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="m12.8 8-2.3 4h3l-2.3 4"/>',
+card:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19M6 14h3M12 14h6"/>',
+bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.4.3.6.8.6 1.3V16h6v-.9c0-.5.2-1 .6-1.3A6 6 0 0 0 12 3z"/><path d="m12.6 7-1.8 3.2h2.6L11.6 13"/>',
+tag:'<rect x="2.5" y="6" width="19" height="12" rx="1.5"/><path d="M5.5 10h13M5.5 14h7"/>',
+cyl:'<path d="M9 3h6v3H9z"/><rect x="6" y="6" width="12" height="15" rx="4"/><path d="M6 11h12"/>',
+wifi:'<path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.2" r=".8"/>',
+drop:'<path d="M12 3s6 6.7 6 11a6 6 0 0 1-12 0c0-4.3 6-11 6-11z"/>',
+tv:'<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>',
+rupee:'<path d="M7 4.5h10M7 9h10M8 4.5h2.5a4.5 4.5 0 0 1 0 9H8l7 6.5"/>',
+plus:'<path d="M12 4.5v15M4.5 12h15"/>',
+x:'<path d="M7 7l10 10M17 7 7 17"/>',
+check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+down:'<path d="m6 9 6 6 6-6"/>',
+right:'<path d="m9 6 6 6-6 6"/>',
+arrowR:'<path d="M4 12h16M14 6l6 6-6 6"/>',
+edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2.8l1.6 2.3 2.7-.6.6 2.7 2.3 1.6-1.3 2.4 1.3 2.4-2.3 1.6-.6 2.7-2.7-.6L12 21.2l-1.6-2.3-2.7.6-.6-2.7-2.3-1.6L6.1 12 4.8 9.6l2.3-1.6.6-2.7 2.7.6z"/>',
+wa:'<path d="M3.8 20.2l1.3-4a8.3 8.3 0 1 1 3 3z"/><path d="M9.2 8.2c-.6.3-1 1-.8 1.8.6 2.4 2.4 4.3 4.8 5 .8.2 1.5-.2 1.8-.8l.2-.6-1.8-1-.9.7c-1.1-.5-2-1.4-2.5-2.5l.7-.9-1-1.8z"/>',
+circle:'<circle cx="12" cy="12" r="9.6" stroke-dasharray="3.2 2.3"/><circle cx="12" cy="8.3" r="2.1"/><circle cx="7.9" cy="14.6" r="2.1"/><circle cx="16.1" cy="14.6" r="2.1"/>',
+equal:'<path d="M5 9h14M5 15h14"/>',
+pie:'<circle cx="12" cy="12" r="9"/><path d="M12 3v9h9M12 12l-6.4 6.4"/>',
+pct:'<path d="M18.5 5.5 5.5 18.5"/><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/>',
+home:'<path d="M4 11 12 4l8 7v9h-5.5v-6h-5v6H4z"/>',
+repeat:'<path d="M17 2.5l3 3-3 3"/><path d="M4 11V9.5a4 4 0 0 1 4-4h12"/><path d="M7 21.5l-3-3 3-3"/><path d="M20 13v1.5a4 4 0 0 1-4 4H4"/>',
+person:'<circle cx="12" cy="8" r="4" fill="currentColor" stroke="none"/><path d="M4 20.5c.8-4 4-6 8-6s7.2 2 8 6z" fill="currentColor" stroke="none"/>',
+dl:'<path d="M17 7 7 17M7 9.5V17h7.5"/>',
+ur:'<path d="M7 17 17 7M9.5 7H17v7.5"/>',
+gift:'<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11M12 9S10.5 4 8 5s1 4 4 4zM12 9s1.5-5 4-4-1 4-4 4z"/>',
+cash:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>',
+book:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7M9 15h7M9 7h4"/>',
+share:'<path d="M12 15V3.5m0 0-4 4m4-4 4 4M5 13v6.5h14V13"/>',
+lock:'<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>',
+spark:'<path d="M11 3l1.9 5.1L18 10l-5.1 1.9L11 17l-1.9-5.1L4 10l5.1-1.9z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
+helpc:'<circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.4v.6"/><circle cx="12" cy="16.8" r=".5"/>',
+contacts:'<rect x="5.5" y="2.5" width="14" height="19" rx="2"/><circle cx="12.5" cy="10" r="2.6"/><path d="M8.5 17c.6-2.1 2-3.2 4-3.2s3.4 1.1 4 3.2"/><path d="M3.5 7h3M3.5 12h3M3.5 17h3"/>',
+pocket:'<rect x="5" y="7" width="14" height="13" rx="3"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7M9 12h6"/>',
+users:'<circle cx="9" cy="8" r="3.4"/><path d="M2.8 20c.6-3.6 3-5.6 6.2-5.6s5.6 2 6.2 5.6"/><circle cx="17" cy="9" r="2.6"/><path d="M16.6 14.4c2.6.2 4.2 2 4.6 4.8"/>'
+};
+function ic(n,s,c,w){return '<svg width="'+(s||24)+'" height="'+(s||24)+'" viewBox="0 0 24 24" fill="none" stroke="'+(c||'currentColor')+'" stroke-width="'+(w||1.8)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>'}
+
+/* ================= DATA ================= */
+const AV={green:['#C1FFBE','#019853'],pink:['#FFDDDC','#B3261E'],peach:['#FEE0BC','#7A4E2D'],lav:['#E5E5FF','#4F4CA7'],blue:['#D5E6F6','#326590'],teal:['#BAF3EA','#157361']};
+const ME={id:'me',name:'Ananya Sen',phone:'98450 11223',color:'green'};
+const CONTACTS=[
+ {id:'c1',name:'Arjun Rao',phone:'97400 56789',color:'blue'},
+ {id:'c2',name:'Kabir Mehta',phone:'98200 34567',color:'peach'},
+ {id:'c3',name:'',phone:'89210 55220',color:'teal'},
+ {id:'c4',name:'Meera Joshi',phone:'98450 67890',color:'green'},
+ {id:'c5',name:'Neha Iyer',phone:'99000 45678',color:'lav'},
+ {id:'c6',name:'Riya Sharma',phone:'98110 23456',color:'pink'},
+ {id:'c7',name:'Rohan Das',phone:'90080 78901',color:'pink'},
+ {id:'c8',name:'Sana Khan',phone:'99860 89012',color:'peach'},
+ {id:'c9',name:'Vikram Nair',phone:'98860 90123',color:'lav'}
+];
+const CATS={
+ mobile:{t:'Mobile Recharge',ic:'phone',b:['Jio Prepaid','Airtel Prepaid','Vi Prepaid'],f:'Mobile Number',v:'98765 43210',a:899,info:'Plan ₹899 · 84 days'},
+ electricity:{t:'Electricity Bill',ic:'bulb',b:['BESCOM','Tata Power','Adani Electricity'],f:'Consumer Number',v:'1234 5678 90',a:1840},
+ lpg:{t:'Book Gas Cylinder',ic:'cyl',b:['Indane Gas','HP Gas','Bharat Gas'],f:'LPG ID / Registered Mobile',v:'7100 0045 6789',a:905,info:'1 cylinder · 14.2 kg'},
+ broadband:{t:'Broadband Bill',ic:'wifi',b:['Airtel Xstream Fiber','ACT Fibernet','JioFiber'],f:'Account Number',v:'2045 7781',a:1179},
+ water:{t:'Water Bill',ic:'drop',b:['BWSSB','Delhi Jal Board'],f:'RR Number',v:'W-55021',a:420},
+ dth:{t:'DTH Recharge',ic:'tv',b:['Tata Play','Airtel Digital TV'],f:'Subscriber ID',v:'1023 4567 89',a:350},
+ other:{t:'Other Expense',ic:'rupee'}
+};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONL=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const KEY='paytm-circle-prototype-v3';
+let S=load();
+function blank(){return {circles:[],seq:1,month:'2026-11'}}
+function load(){try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&v.circles)return v}catch(e){}return blank()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const uid=p=>p+(S.seq++);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const rs=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+function mlabel(m){const [y,mm]=m.split('-');return MONL[+mm-1]+' '+y}
+function mshort(m){return MON[+m.split('-')[1]-1]}
+function today(){return '15 '+mshort(S.month)}
+function nextMonth(m){let [y,mm]=m.split('-').map(Number);mm++;if(mm>12){mm=1;y++}return y+'-'+String(mm).padStart(2,'0')}
+function person(id){return id==='me'?ME:CONTACTS.find(c=>c.id===id)}
+function ini(p){if(!p.name)return '';const w=p.name.split(' ');return (w[0][0]+(w[1]?w[1][0]:'')).toUpperCase()}
+function nm(id,you){const p=person(id);if(id==='me')return you===false?'You':'Ananya (You)';return p.name||p.phone}
+function first(id){if(id==='me')return 'You';const p=person(id);return p.name?p.name.split(' ')[0]:p.phone}
+function av(id,cls){const p=person(id);const c=AV[p.color];return '<span class="av '+(cls||'')+'" style="background:'+c[0]+';color:'+c[1]+'">'+(p.name?ini(p):ic('person',cls==='s'?20:28,c[1]))+'</span>'}
+const circ=id=>S.circles.find(c=>c.id===id);
+
+/* split maths */
+function shareMap(amount,sp){
+  const out={};const mem=sp.mode==='equal'?sp.members:Object.keys(sp.values||{}).filter(k=>+sp.values[k]>0);
+  if(!mem.length)return out;
+  if(sp.mode==='amount'){mem.forEach(m=>out[m]=+sp.values[m]);return out}
+  let weights;
+  if(sp.mode==='equal')weights=mem.map(()=>1);
+  else weights=mem.map(m=>+sp.values[m]);
+  const tw=weights.reduce((a,b)=>a+b,0);let acc=0;
+  mem.forEach((m,i)=>{out[m]=Math.floor(amount*weights[i]/tw);acc+=out[m]});
+  let r=Math.round(amount-acc);let i=0;while(r>0){out[mem[i%mem.length]]++;r--;i++}
+  return out;
+}
+function splitMembers(sp){return sp.mode==='equal'?sp.members.slice():Object.keys(sp.values||{}).filter(k=>+sp.values[k]>0)}
+function splitDesc(sp){const n=splitMembers(sp).length;return ({equal:'Equally',amount:'By amounts',percent:'By percentage',shares:'By shares'})[sp.mode]+' · '+n+' '+(n===1?'person':'people')}
+function balances(c){
+  const d={};const add=(a,b,v)=>{if(a===b||!v)return;d[a+'>'+b]=(d[a+'>'+b]||0)+v};
+  c.bills.filter(b=>b.status==='paid').forEach(b=>{const sh=shareMap(b.amount,b.split);Object.keys(sh).forEach(s=>Object.keys(b.paidBy).forEach(p=>add(s,p,sh[s]*b.paidBy[p]/b.amount)))});
+  (c.settle||[]).forEach(t=>add(t.to,t.from,t.amt));
+  const rows=c.members.filter(m=>m!=='me').map(m=>{const v=(d[m+'>me']||0)-(d['me>'+m]||0);return {m,v:Math.round(v)}});
+  return {rows,get:rows.filter(r=>r.v>0).reduce((a,r)=>a+r.v,0),pay:rows.filter(r=>r.v<0).reduce((a,r)=>a-r.v,0)};
+}
+
+/* ================= NAV ================= */
+const app=document.getElementById('app');
+let NAV=[{n:'home',p:{}}],SHEET=null,T={flow:null,draft:null,hs:null,q:''};
+function top(){return NAV[NAV.length-1]}
+function go(n,p){NAV.push({n,p:p||{}});SHEET=null;T.q='';render(true)}
+function back(){if(SHEET){SHEET=null;render();return}if(NAV.length>1){NAV.pop();render(true)}}
+function popTo(n,patch){let i=NAV.length-1;while(i>0&&NAV[i].n!==n)i--;NAV=NAV.slice(0,i+1);if(patch)Object.assign(NAV[i].p,patch);SHEET=null;render(true)}
+function sheet(n,p){SHEET={n,p:p||{}};render()}
+let storyT=null,doneT=null;
+function render(fresh){
+  const t=top();const prev=app.querySelector('.scr .body');const st=(!fresh&&prev)?prev.scrollTop:0;
+  clearTimeout(storyT);clearTimeout(doneT);
+  app.innerHTML=PAGES[t.n](t.p)+(SHEET?'<div class="ov" data-a="closeSheet"></div><div class="sheet" role="dialog">'+SHEETS[SHEET.n](SHEET.p)+'</div>':'')+'<div id="toast"></div>';
+  const b=app.querySelector('.scr .body');if(b)b.scrollTop=st;
+  const sb={circle:'#FFF3EA',done:'#15883A',home:'#F5F5F5',select:'#F5F5F5',details:'#F5F5F5',howsplit:'#F5F5F5',cats:'#F5F5F5',fetch:'#F5F5F5',payany:'#F5F5F5'}[t.n]||'#fff';
+  document.getElementById('sbar').style.background=SHEET?'#4d4d4d':sb;
+  document.getElementById('sbar').style.color=(t.n==='done'||SHEET)?'#fff':'#222';
+  AFTER[t.n]&&AFTER[t.n](t.p);
+}
+function toast(m){const el=document.getElementById('toast');if(!el)return;el.textContent=m;el.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>el.classList.remove('on'),2600)}
+
+/* ================= PAGES ================= */
+const PAGES={},SHEETS={},AFTER={},ACT={},INP={};
+
+/* ---- HOME ---- */
+const phoneArt='<svg width="120" height="110" viewBox="0 0 120 110"><path d="M10 34l6-6" stroke="#F2649B" stroke-width="3" stroke-linecap="round"/><path d="M104 66l12-4" stroke="#2BD6B5" stroke-width="4" stroke-linecap="round"/><g transform="rotate(14 60 55)"><rect x="38" y="10" width="46" height="90" rx="9" fill="#1E5FD8"/><rect x="42" y="14" width="38" height="82" rx="6" fill="#EAF6FF"/><circle cx="61" cy="53" r="13" fill="#3EC56B"/><path d="m55 53 4 4 8-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></g><circle cx="20" cy="76" r="13" fill="#F4C443" stroke="#D99A12" stroke-width="2"/><text x="20" y="81" font-size="13" text-anchor="middle" fill="#B5770B" font-weight="700">₹</text><circle cx="92" cy="14" r="12" fill="#F4C443" stroke="#D99A12" stroke-width="2"/><text x="92" y="19" font-size="12" text-anchor="middle" fill="#B5770B" font-weight="700">₹</text></svg>';
+PAGES.home=()=>{
+  const tiles=[['phone','Mobile<br>Recharge','mobile'],['card','Credit Card<br>Bill'],['bulb','Electricity<br>Bill'],['tag','FASTag<br>Recharge'],['cyl','Book Gas<br>Cylinder'],['wifi','Broadband<br>Bill'],['tv','DTH<br>Recharge']];
+  return '<div class="scr home"><div class="body">'+
+  '<div class="h-top"><div class="av-as">AS</div><div class="gold">Get up to <b>10,000</b><br>Gold coins <span class="gold-go">'+ic('right',10,'#fff',3.4)+'</span></div><span class="sp"></span><button class="ib" data-a="nyi" aria-label="Search">'+ic('search',26,'#131313',2)+'</button><button class="ib" data-a="nyi" aria-label="Notifications">'+ic('bell',26,'#131313',2)+'</button></div>'+
+  '<div class="banner"><div class="bn-t">Send money to loved ones on-the-go</div><button class="bn-b" data-a="nyi">Use Paytm for UPI</button><div class="bn-art">'+phoneArt+'</div><div class="dots"><i class="on"></i><i></i></div><span class="tnc">T&amp;C apply</span></div>'+
+  '<div class="card upi"><h2>UPI Money Transfer</h2><div class="g4">'+[['scan','Scan any<br>QR'],['payany','Pay<br>Anyone'],['bank','To Bank &amp;<br>Self A/c'],['doc','Balance &amp;<br>History']].map(x=>'<button class="u" data-a="'+(x[0]==='payany'?'openPayAny':'nyi')+'"><span class="uc">'+ic(x[0],25,'#fff',1.7)+'</span><span>'+x[1]+'</span></button>').join('')+'</div></div>'+
+  '<div class="card rb"><div class="rb-h"><h2>Recharge &amp; Bills</h2><button class="va" data-a="nyi">View All '+ic('arrowR',20,'#2074CA',1.8)+'</button></div>'+
+  '<div class="tiles" id="tiles"><button class="t t-circle" data-a="circleEntry" data-v="home"><span class="ti">'+ic('circle',28,'#004299',1.7)+'</span><span class="tl">Add your<br>Circle</span><em>NEW</em></button>'+
+  tiles.map(x=>'<button class="t" data-a="'+(x[2]?'openPay':'nyi')+'"><span class="ti">'+ic(x[0],28,'#0B3F8F',1.6)+'</span><span>'+x[1]+'</span></button>').join('')+'</div>'+
+  '<div class="ind"><i id="indi"></i></div></div>'+
+  '<div class="g2"><div class="c tall"><span class="bic" style="background:#EEF2F6">'+ic('card',22,'#6B7A8F',1.6)+'</span><div><div class="pp1">Paytm Postpaid</div><div class="pp2">Start using with up to ₹1 Lakh limit</div></div></div><div class="c small">'+ic('users',24,'#7A8799',1.5)+'Refer &amp; Win</div><div class="c small">'+ic('gift',24,'#7A8799',1.5)+"What's New</div></div>"+
+  '<div style="height:96px"></div></div>'+
+  '<button class="scanqr" data-a="nyi">'+ic('scan',24,'#fff',1.8)+'Scan QR</button></div>';
+};
+AFTER.home=()=>{const t=document.getElementById('tiles'),i=document.getElementById('indi');if(!t)return;const f=()=>{const r=t.clientWidth/t.scrollWidth;i.style.width=(r*100)+'%';i.style.left=(t.scrollLeft/t.scrollWidth*100)+'%'};t.addEventListener('scroll',f);f()};
+
+/* ---- AI SUGGESTIONS (illustrative co-payment rates) ---- */
+const AISUG={mobile:[['electricity',82],['broadband',67]],electricity:[['lpg',86],['broadband',64]],lpg:[['electricity',91],['water',58]],broadband:[['electricity',79],['dth',61]],water:[['electricity',88],['lpg',72]],dth:[['broadband',71],['electricity',69]],other:[['electricity',80],['lpg',74]]};
+const SHORT={mobile:'Mobile Recharge',electricity:'Electricity Bill',lpg:'LPG Cylinder',broadband:'Broadband Bill',water:'Water Bill',dth:'DTH Recharge',other:'shared expenses'};
+function aiFor(cat,exclude){return (AISUG[cat]||[]).find(x=>!exclude.includes(x[0]))}
+function circleAI(c){const paid=c.bills.filter(b=>b.status==='paid');if(!paid.length)return null;const last=paid[paid.length-1];const cat=c.series.find(s=>s.id===last.sid).cat;
+ const have=c.series.map(s=>s.cat).concat(c.aiDismiss||[]);const s=aiFor(cat,have);return s?{from:cat,to:s[0],p:s[1]}:null}
+const SHORT2={mobile:'Recharge',electricity:'Electricity',lpg:'LPG',broadband:'Broadband',water:'Water',dth:'DTH'};
+const TIER=n=>n<=1?0:n===2?25:n===3?30:n===4?40:50;
+function catCount(c){return new Set(c.series.filter(s=>s.cat!=='other').map(s=>s.cat)).size}
+function nextOff(c){return TIER(catCount(c)+1)}
+function payLine(b){if(!b)return '';return b.status==='paid'?'<div class="pl ok">✓ Paid by '+Object.keys(b.paidBy).map(first).join(', ')+'</div>':'<div class="pl due">Unpaid · due '+b.due+'</div>'}
+function aiCard(from,to,p,btnAct,dismiss,off){return '<div class="ai">'+(dismiss?'<button class="ax" data-a="aiDismiss" data-v="'+to+'" aria-label="Dismiss">'+ic('x',14,'#666',2.2)+'</button>':'')+
+ '<div class="ai-r">'+ic('spark',18,'#00B8F6',1.8)+'<span><b>'+p+'%</b> also pay '+SHORT2[to]+'</span></div>'+
+ '<div class="ai-r2"><button class="ab" data-a="'+btnAct+'" data-v="'+to+'">'+ic('plus',15,'#fff',2.4)+'Add '+SHORT2[to]+'</button>'+(off?'<span class="offp">Flat ₹'+off+' off</span>':'')+'</div></div>'}
+
+/* ---- PAY ANYONE ---- */
+PAGES.payany=()=>{const sug=['c6','c2','c5','c1','c4','c7','c8','c9'];
+ const rec=[['c6','Paid ₹450 · 12 Nov'],['c2','Received ₹1,200 · 9 Nov'],['c5','Paid ₹230 · 3 Nov']];
+ return '<div class="scr"><div class="hdr" style="justify-content:space-between;padding-right:12px"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button><button class="pa-help" data-a="nyi">'+ic('helpc',22,'#444',1.6)+'Help</button></div><div class="body">'+
+ '<div class="pa-t">Pay Anyone</div><div class="pa-s">Send money to any UPI app <span class="logo" style="font-size:17px;letter-spacing:-.8px">pay<span>tm</span></span></div>'+
+ '<div class="pa-sr"><div class="pa-in">Enter Name, Mobile No. or UPI…</div><button class="pa-ct" data-a="nyi">'+ic('contacts',28,'#0B3F8F',1.7)+'<span>Contacts</span></button></div>'+
+ '<div class="pa-h">Suggestions</div><div class="card pa-g">'+sug.map(id=>{const p=person(id);return '<button class="pa-p" data-a="nyi">'+av(id,'xl')+'<span>'+(p.name?p.name.replace(' ','<br>'):p.phone)+'</span></button>'}).join('')+'</div>'+
+ '<div class="pa-chips"><button class="pa-c" data-a="nyi">'+ic('rupee',20,'#1A5DB8',1.7)+'Split Bills</button><button class="pa-c" data-a="circleEntry" data-v="payany">'+ic('circle',20,'#1A5DB8',1.7)+'Add Circle</button><button class="pa-c" data-a="nyi">'+ic('pocket',20,'#1A5DB8',1.7)+'Pocket Money</button><button class="pa-c" data-a="nyi">'+ic('bank',20,'#1A5DB8',1.7)+'Bank Transfer</button></div>'+
+ '<div class="pa-h">Recent Payments'+ic('search',24,'#222',1.9)+'</div><div class="card list" style="margin-top:16px;padding:4px 0">'+rec.map(r=>'<div class="row">'+av(r[0])+'<span class="tx"><span class="nm"><div class="n1">'+person(r[0]).name+'</div><div class="n2">'+r[1]+'</div></span><button class="pay" style="background:#fff;color:#004299;border:1.5px solid #C9DDF5" data-a="nyi">Pay</button></span></div>').join('')+'</div><div style="height:24px"></div></div>'+
+ '<div class="pa-ft"><b style="font-weight:900;color:#888;font-size:13px;letter-spacing:-.5px">paytm</b>|<span>Powered by UPI</span></div></div>'};
+
+/* ---- PAYMENT SUCCESS ---- */
+PAGES.success=()=>'<div class="scr w"><div class="hdr"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button><span class="sp"></span><div class="logo">pay<span>tm</span></div><span class="sp"></span><span style="width:48px"></span></div>'+
+ '<div class="body"><div class="sc-card"><div class="sc-in">'+
+ '<div class="sc-t">Mobile Recharge Successful <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 1.5l2.6 1.9 3.2-.2 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.2L12 22.5l-2.6-1.9-3.2.2-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.2z" fill="#23C079"/><path d="m8 12.2 2.8 2.8L16.2 9.6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>'+
+ '<div class="sc-d">14 Nov, 6:51 PM <a>View details</a></div>'+
+ '<div class="sc-op"><div class="jio">Jio</div><div><div>Jio</div><div>98765 43210</div><div>Paid ₹899</div></div></div>'+
+ '<div class="dash"></div><div class="note"><b>Note:</b> Plan benefits have been added to your account</div>'+
+ '<div class="sc-btns"><button class="pb f" data-a="nyi">Pay Another Bill</button><button class="pb o" data-a="circleEntry" data-v="payment">Add your Circle</button><button class="pb o" data-a="nyi">Download Invoice</button><button class="pb o" data-a="nyi">Share</button></div>'+
+ aiCard('mobile','electricity',82,'aiFromPay',false,25)+
+ '</div><div class="scratch"><span class="sw">WIN</span>YOU WON A SCRATCH CARD &nbsp;•&nbsp; YOU WON</div></div>'+
+ '<div class="goldb"><span class="coin"></span><span class="gt">Get 10,000<br>Paytm Gold Coins</span><span class="gp">Pay Now '+ic('arrowR',12,'#fff',2.2)+'</span></div>'+
+ '<div class="rdone"><div class="g">Recharge done ✓</div><div class="b">Now unlock savings!</div></div><div style="height:110px"></div></div>'+
+ '<div class="bnav"><button data-a="goHome">'+ic('home',24,'#fff',1.7)+'Home</button><button data-a="nyi">'+ic('scan',24,'#fff',1.7)+'Scan</button><button data-a="nyi">'+ic('cash',24,'#fff',1.7)+'Cashback</button><button data-a="nyi">'+ic('book',24,'#fff',1.7)+'Passbook</button></div></div>';
+
+/* ---- ONBOARDING (story) ---- */
+const STORY=[
+ ['Sharing a home with friends?','house'],
+ ['All your home bills in one place','bills'],
+ ['Anyone in the circle can pay','pay'],
+ ['Splits repeat every month','repeat'],
+ ['Everyone knows once it’s paid','bell']
+];
+function art(k){
+  const head=(x,y,c)=>'<circle cx="'+x+'" cy="'+y+'" r="13" fill="'+c+'"/><path d="M'+(x-20)+' '+(y+38)+'a20 20 0 0 1 40 0z" fill="'+c+'"/>';
+  if(k==='house')return '<svg width="250" height="250" viewBox="0 0 250 250"><circle cx="125" cy="125" r="112" fill="#EAF5FF"/><path d="M45 120 125 52l80 68" fill="none" stroke="#0B3F8F" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/><rect x="62" y="112" width="126" height="98" rx="8" fill="#fff" stroke="#0B3F8F" stroke-width="6"/><rect x="80" y="130" width="32" height="28" rx="4" fill="#BFE8FB"/><rect x="138" y="130" width="32" height="28" rx="4" fill="#BFE8FB"/>'+head(96,176,'#F7A8A3')+head(125,170,'#00B8F6')+head(154,176,'#F4C443')+'</svg>';
+  if(k==='bills')return '<svg width="250" height="250" viewBox="0 0 250 250"><circle cx="125" cy="125" r="112" fill="#EAF5FF"/><rect x="58" y="62" width="134" height="140" rx="14" fill="#fff" stroke="#0B3F8F" stroke-width="6"/>'+[0,1,2].map(i=>'<circle cx="86" cy="'+(98+i*36)+'" r="12" fill="'+['#FFE8A3','#BFE8FB','#FFD9D6'][i]+'"/><rect x="108" y="'+(92+i*36)+'" width="62" height="10" rx="5" fill="#C9D6EA"/>').join('')+'<circle cx="186" cy="68" r="22" fill="#00B8F6"/><path d="m176 68 7 7 13-13" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/></svg>';
+  if(k==='pay')return '<svg width="250" height="250" viewBox="0 0 250 250"><circle cx="125" cy="125" r="112" fill="#EAF5FF"/><g transform="rotate(-8 125 125)"><rect x="88" y="40" width="76" height="150" rx="14" fill="#1E5FD8"/><rect x="95" y="48" width="62" height="134" rx="9" fill="#fff"/><circle cx="126" cy="108" r="20" fill="#3EC56B"/><path d="m116 108 7 7 13-13" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/><rect x="106" y="140" width="40" height="8" rx="4" fill="#C9D6EA"/></g>'+head(52,150,'#F7A8A3')+head(198,150,'#F4C443')+'</svg>';
+  if(k==='repeat')return '<svg width="250" height="250" viewBox="0 0 250 250"><circle cx="125" cy="125" r="112" fill="#EAF5FF"/><rect x="60" y="66" width="130" height="122" rx="14" fill="#fff" stroke="#0B3F8F" stroke-width="6"/><path d="M60 98h130" stroke="#0B3F8F" stroke-width="6"/><path d="M90 56v20M160 56v20" stroke="#0B3F8F" stroke-width="7" stroke-linecap="round"/><path d="M98 146a28 28 0 0 1 48-22M152 136a28 28 0 0 1-48 22" stroke="#00B8F6" stroke-width="7" fill="none" stroke-linecap="round"/><path d="m146 112 1 13-13 0" stroke="#00B8F6" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  return '<svg width="250" height="250" viewBox="0 0 250 250"><circle cx="125" cy="125" r="112" fill="#EAF5FF"/><path d="M80 160v-42a45 45 0 0 1 90 0v42l12 12H68z" fill="#fff" stroke="#0B3F8F" stroke-width="7" stroke-linejoin="round"/><path d="M110 188h30" stroke="#0B3F8F" stroke-width="7" stroke-linecap="round"/><circle cx="172" cy="80" r="22" fill="#3EC56B"/><path d="m162 80 7 7 13-13" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/></svg>';
+}
+PAGES.onboard=p=>{const i=p.i||0;return '<div class="scr w"><div class="hdr ob-h"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button><div class="ob-mid"><div class="logo" style="font-size:29px">pay<span>tm</span></div><div class="ob-sub">Add Circle</div></div><span style="width:48px"></span></div>'+
+ '<div class="prog">'+STORY.map((s,j)=>'<i class="'+(j<i?'done':j===i?'cur':'')+'"><b></b></i>').join('')+'</div>'+
+ '<div class="body" data-a="storyTap"><div class="ob-art">'+art(STORY[i][1])+'</div><div class="ob-t">'+STORY[i][0]+'</div></div>'+
+ '<div class="foot nb" style="padding-bottom:40px"><button class="btn" data-a="obStart">Start your circle</button></div></div>'};
+AFTER.onboard=p=>{storyT=setTimeout(()=>{if(top().n==='onboard'&&!SHEET){p.i=((p.i||0)+1)%STORY.length;render()}},3600)};
+
+/* ---- SELECT PEOPLE ---- */
+function selCandidates(){const f=T.flow;const ex=f.mode==='addmember'?circ(f.cid).members:['me'];const q=T.q.toLowerCase().replace(/\s/g,'');return CONTACTS.filter(c=>!ex.includes(c.id)).filter(c=>!q||(c.name+c.phone).toLowerCase().replace(/\s/g,'').includes(q))}
+function listHTML(){const sel=T.flow.sel;const c=selCandidates();if(!c.length)return '<div style="padding:24px;text-align:center;color:#777">No contacts found</div>';
+ return c.map(x=>'<button class="row" data-a="selToggle" data-v="'+x.id+'" style="width:100%">'+av(x.id)+'<span class="tx"><span class="nm">'+(x.name?'<div class="n1">'+x.name+'</div><div class="n2">'+x.phone.replace(/\s/g,'')+'</div>':'<div class="n1 big">'+x.phone+'</div>')+'</span><span class="rad'+(sel.includes(x.id)?' on':'')+'">'+(sel.includes(x.id)?ic('check',13,'#fff',3):'')+'</span></span></button>').join('')}
+PAGES.select=()=>{const f=T.flow;const sel=f.sel;
+ if(!sel.length) return '<div class="scr"><div class="hdr"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button></div><div class="body">'+
+ '<div class="h1" style="line-height:36px;margin-top:2px">'+(f.mode==='addmember'?'Select people to add to '+circ(f.cid).name:'Select people to add to your circle')+'</div>'+
+ '<label class="srch">'+ic('search',24,'#222',1.9)+'<input data-in="search" placeholder="Enter Name or Mobile Number" value="'+T.q+'"></label>'+
+ '<div class="card list" id="clist" style="margin-top:16px;padding:8px 0">'+listHTML()+'</div><div style="height:20px"></div></div></div>';
+ return '<div class="scr"><div class="hdr" style="height:64px;padding-top:4px"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button><label class="srch ol">'+ic('search',26,'#222',1.9)+'<input data-in="search" placeholder="Enter Name or Mobile Number" value="'+T.q+'"></label></div>'+
+ '<div class="body"><div class="card chips" style="margin-top:12px;padding-left:8px">'+sel.map(id=>'<button class="chip" data-a="selToggle" data-v="'+id+'"><span style="position:relative">'+av(id)+'<span class="x">'+ic('x',10,'#fff',3)+'</span></span><span>'+(person(id).name||person(id).phone)+'</span></button>').join('')+'</div>'+
+ '<div class="card list" id="clist" style="margin-top:16px;padding:8px 0">'+listHTML()+'</div><div style="height:20px"></div></div>'+
+ '<div class="foot"><button class="btn" data-a="selContinue">Continue</button></div></div>';
+};
+
+/* ---- CIRCLE DETAILS ---- */
+PAGES.details=()=>{const f=T.flow;return '<div class="scr"><div class="hdr"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button></div><div class="body">'+
+ '<div class="h1" style="margin-top:2px">Circle Details</div>'+
+ '<div class="card dcard"><span class="cic">'+ic('circle',28,'#FB7A74',2)+'</span><div class="fld"><label>Circle Name</label><input data-in="cname" value="'+f.name.replace(/"/g,'&quot;')+'" maxlength="28"></div></div>'+
+ '<div class="sec">'+f.sel.length+' member'+(f.sel.length===1?'':'s')+' selected</div>'+
+ '<div class="card chips" style="padding:16px 0 12px 8px">'+f.sel.map(id=>'<button class="chip" data-a="detRemove" data-v="'+id+'"><span style="position:relative">'+av(id)+'<span class="x">'+ic('x',10,'#fff',3)+'</span></span><span>'+(person(id).name||person(id).phone)+'</span></button>').join('')+
+ '<button class="chip addm" data-a="back"><span class="av">'+ic('plus',26,'#222',1.8)+'</span><span>Add<br>Member</span></button></div>'+
+ '</div>'+
+ '<div class="foot"><button class="btn" data-a="createCircle" '+(f.name.trim()&&f.sel.length?'':'disabled')+' id="cbtn">Create Circle</button></div></div>'};
+
+/* ---- CIRCLE HOME ---- */
+function billRow(c,b){const s=c.series.find(x=>x.id===b.sid);const sh=shareMap(b.amount,b.split);const mine=sh.me||0;
+ const payer=b.status==='paid'?Object.keys(b.paidBy):[];
+ const sub=b.status==='paid'?'Paid by '+payer.map(first).join(', ')+' · '+b.paidOn:(s.biller?s.biller+' · ':'')+'Due '+b.due+(mine?' · Your share '+rs(mine):'');
+ return '<button class="brow" data-a="billOpen" data-v="'+b.id+'"><span class="bic">'+ic(CATS[s.cat].ic,22,'#0B3F8F',1.7)+'</span><span class="bt"><div class="bt1">'+s.label+'</div><div class="bt2">'+sub+'</div></span><span class="bamt">'+rs(b.amount)+(b.status==='paid'?'<div class="paid">'+ic('check',12,'#15883A',3)+'Paid</div>':'<div>'+(b.off?'<span class="offp" style="margin-right:6px">₹'+b.off+' off</span>':'')+'<span class="pay" data-a="payBill" data-v="'+b.id+'" style="display:inline-flex;align-items:center">Pay</span></div>')+'</span></button>'}
+PAGES.circle=p=>{const c=circ(p.id);if(!c)return PAGES.home();const tab=p.tab||'bills';const bal=balances(c);
+ let body='';
+ if(tab==='bills'){
+  if(!c.bills.length){body='<div class="empty"><div class="ei">'+ic('doc',30,'#004299',1.6)+'</div><h4>No bills in this circle yet</h4><p>Add your home’s recurring bills (electricity, gas, broadband, recharges) and choose who shares each one.</p><button class="btn" style="margin-top:18px" data-a="addBill">'+ic('plus',20,'#fff',2.2)+'Add Bill</button></div>'}
+  else{const ai=circleAI(c);if(ai)body+='<div style="margin:0 12px">'+aiCard(ai.from,ai.to,ai.p,'aiAdd',true,nextOff(c))+'</div>';const months=[...new Set(c.bills.map(b=>b.month))].sort().reverse();
+   body+=months.map(m=>{const bs=c.bills.filter(b=>b.month===m);const due=bs.filter(b=>b.status==='due').length;return '<div class="mcard"><div class="mhd">'+mlabel(m)+'<small>'+(due?due+' due':'All paid')+'</small></div>'+bs.map(b=>billRow(c,b)).join('')+'</div>'}).join('');}
+  body+='<div class="h2s">History</div><div class="mcard" style="padding:2px 0">'+c.hist.slice().reverse().map(h=>'<div class="hrow"><div><div class="a">'+h.t+'</div><div class="b">'+h.d+'</div></div>'+(h.r?'<div class="c">'+h.r+'<b style="color:'+(h.rc||'#15883A')+'">'+h.rv+'</b></div>':'')+'</div>').join('')+'</div>';
+ }else{
+  body='<div class="scard" style="padding-bottom:0"><div style="font-size:17px;font-weight:700;padding:0 16px 2px;letter-spacing:-.2px">Balances</div>'+bal.rows.map(r=>'<div class="srow">'+av(r.m,'m')+'<div style="flex:1"><div style="font-size:15.5px">'+nm(r.m)+'</div><div style="font-size:13px;margin-top:2px;color:'+(r.v>0?'#15883A':r.v<0?'#D9343F':'#777')+'">'+(r.v>0?'owes you '+rs(r.v):r.v<0?'you owe '+rs(-r.v):'settled up')+'</div></div></div>'+
+   (r.v>0?'<div class="sact"><button data-a="markRec" data-v="'+r.m+'">Mark as Received</button><i></i><button data-a="remind" data-v="'+r.m+'">Send Reminder</button></div>':r.v<0?'<div class="sact"><button data-a="settlePay" data-v="'+r.m+'" style="color:#004299">Pay '+rs(-r.v)+'</button></div>':'<div class="sact" style="padding:6px 0"></div>')).join('')+'</div>';
+  body+='<div class="h2s" style="padding-top:22px">Bill splits</div>';
+  if(!c.series.length)body+='<div class="empty">'+'<p>No bills yet. Add a bill to set up its split.</p><button class="btn" style="margin-top:16px" data-a="addBill">'+ic('plus',20,'#fff',2.2)+'Add Bill</button></div>';
+  body+=c.series.map(s=>{const lb=latestBill(c,s.id);const sh=lb?shareMap(lb.amount,lb.split):{};const inc=splitMembers(s.split);
+   return '<div class="scard"><div class="shd"><span class="bic">'+ic(CATS[s.cat].ic,22,'#0B3F8F',1.7)+'</span><div style="flex:1;min-width:0"><div class="bt1">'+s.label+'</div><div class="bt2">'+(s.rec?ic('repeat',12,'#666',2)+' Monthly · ':'Once · ')+splitMembers(s.split).length+(splitMembers(s.split).length===1?' person':' people')+(s.split.mode==='equal'?'':' · '+({amount:'by amount',percent:'by %',shares:'by shares'})[s.split.mode])+'</div>'+payLine(lb)+'</div><button class="edit" data-a="editSplit" data-v="'+s.id+'">'+ic('edit',15,'#2074CA',2)+'Edit</button></div>'+
+   c.members.map(m=>inc.includes(m)?'<div class="mrow">'+av(m,'s')+'<span class="nm">'+nm(m)+'</span><span class="am">'+rs(sh[m]||0)+'</span></div>':s.cat==='mobile'?'':'<div class="mrow out">'+av(m,'s')+'<span class="nm">'+nm(m)+'</span><button class="addp" data-a="addOne" data-v="'+s.id+'|'+m+'">'+ic('plus',14,'#2074CA',2.6)+'Add</button></div>').join('')+'<div style="height:6px"></div>'+'</div>'}).join('');
+ }
+ return '<div class="scr"><div class="c-head"><div class="c-top"><button class="ib" data-a="goHome" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button><span class="sp"></span><button class="ac" data-a="share">'+ic('wa',28,'#222',1.5)+'Share</button><button class="ac" data-a="settings">'+ic('gear',26,'#222',1.5)+'Settings</button></div>'+
+ '<div class="c-title">'+c.name+'</div><div class="bal"><div><div class="l">You will get</div><div class="v" style="color:#15883A">'+rs(bal.get)+'<span class="bdg" style="background:#15883A">'+ic('dl',13,'#fff',2.6)+'</span></div></div><div class="r"><div class="l">You need to pay</div><div class="v" style="color:#D9343F">'+rs(bal.pay)+'<span class="bdg" style="background:#E53940">'+ic('ur',13,'#fff',2.6)+'</span></div></div></div></div>'+
+ '<div class="tabs"><button class="tab'+(tab==='bills'?' on':'')+'" data-a="tab" data-v="bills">Bills<span class="cnt">'+c.bills.filter(b=>b.status==='due').length+' due</span></button><button class="tab'+(tab==='split'?' on':'')+'" data-a="tab" data-v="split">Split</button><span class="sp"></span><span style="font-size:12.5px;color:#666;align-self:center">'+c.members.length+' members</span></div>'+
+ '<div class="body">'+body+'<div style="height:100px"></div></div>'+
+ (c.bills.length?'<button class="fab" data-a="addBill">'+ic('plus',24,'#fff',2)+'Add Bill</button>':'')+'</div>'};
+function latestBill(c,sid){return c.bills.filter(b=>b.sid===sid).sort((a,b)=>a.month<b.month?1:-1)[0]}
+
+/* ---- ADD BILL: category ---- */
+PAGES.cats=()=>{const c=circ(T.draft.cid);const keys=['mobile','electricity','lpg','broadband','water','dth'];const off=nextOff(c),have=c.series.map(s=>s.cat);
+ return '<div class="scr"><div class="hdr"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button></div><div class="body">'+
+ '<div class="h1">Add a bill</div><div style="font-size:15px;color:#555;padding:4px 12px 0">to '+c.name+'</div>'+
+ '<div class="card" style="margin-top:20px"><div class="ctiles">'+keys.map(k=>'<button class="t" style="width:auto" data-a="pickCat" data-v="'+k+'"><span class="ti">'+ic(CATS[k].ic,28,'#0B3F8F',1.6)+'</span>'+(off&&!have.includes(k)?'<em>Flat ₹'+off+'</em>':'')+'<span>'+CATS[k].t.replace(' ','<br>')+'</span></button>').join('')+'</div></div>'+
+ '<div class="card list" style="margin-top:16px"><button class="row" style="width:100%" data-a="pickCat" data-v="other"><span class="av" style="background:var(--sky)">'+ic('rupee',22,'#0B3F8F',1.8)+'</span><span class="tx"><span class="nm"><div class="n1">Other expense</div><div class="n2">Rent, maid, groceries, anything shared</div></span>'+ic('right',20,'#888',2)+'</span></button></div></div></div>'};
+
+/* ---- ADD BILL: fetch ---- */
+PAGES.fetch=()=>{const d=T.draft;const k=CATS[d.cat];
+ return '<div class="scr"><div class="hdr"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button></div><div class="body">'+
+ '<div class="h1">'+k.t+'</div>'+
+ '<div class="card list brl" style="margin-top:20px;padding:4px 0"><div class="lbl">Select Biller</div>'+k.b.map(b=>'<button class="row" style="width:100%" data-a="pickBiller" data-v="'+b+'"><span class="bic" style="width:36px;height:36px;margin-right:12px">'+ic(k.ic,18,'#0B3F8F',1.7)+'</span><span class="tx" style="min-height:52px"><span class="nm"><div class="n1">'+b+'</div></span><span class="rad'+(d.biller===b?' on':'')+'">'+(d.biller===b?ic('check',13,'#fff',3):'')+'</span></span></button>').join('')+'</div>'+
+ '<div class="card" style="margin-top:16px;padding:22px 16px 18px"><div class="fld"><label>'+k.f+'</label><input data-in="consumer" value="'+d.consumer+'" inputmode="numeric"></div></div>'+
+ (d.fetched?'<div class="binfo"><div class="r"><span>Biller</span><b>'+d.biller+'</b></div><div class="r"><span>Customer name</span><b>Ananya Sen</b></div>'+(k.info?'<div class="r"><span>Details</span><b>'+k.info+'</b></div>':'')+'<div class="r"><span>Bill amount</span><b>'+rs(d.amount)+'</b></div><div class="r"><span>Due date</span><b>'+d.due+' '+S.month.slice(0,4)+'</b></div></div>':'')+
+ '</div><div class="foot"><button class="btn" data-a="'+(d.fetched?'toAmount':'fetchBill')+'">'+(d.fetched?'Continue':'Fetch Bill')+'</button></div></div>'};
+
+/* ---- ADD BILL: amount (Paytm "enter amount to split" layout) ---- */
+function payerChip(d){if(d.payer==='multi')return '<span class="stack" style="margin-left:4px">'+Object.keys(d.paidBy).slice(0,3).map(m=>av(m,'s')).join('')+'</span><span style="margin-left:8px">Multiple</span>';
+ if(!d.payer)return 'Not paid yet';return av(d.payer,'s')+first(d.payer)}
+PAGES.amount=()=>{const d=T.draft;const c=circ(d.cid);const fixed=d.cat!=='other';const k=CATS[d.cat];
+ return '<div class="scr w"><div class="amt-top"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button><span class="cic">'+ic('circle',28,'#FB7A74',2)+'</span></div><div class="body">'+
+ '<div class="amt-t">'+c.name+'</div><div class="amt-l">'+(fixed?'Bill amount to split':'Enter Amount to split')+'</div>'+
+ '<div class="amt-v"><span class="rs">₹</span>'+(fixed?'<span class="fx">'+Math.round(d.amount).toLocaleString('en-IN')+'</span>':'<input data-in="amt" inputmode="numeric" placeholder="0" value="'+(d.amount||'')+'" style="width:'+Math.max(1,String(d.amount||0).length)*0.62+'em">')+'</div>'+
+ '<div class="dpill">'+(fixed?ic(k.ic,16,'#6F6F6F',1.8)+'&nbsp;'+k.t+' · '+d.biller:'<input data-in="label" placeholder="What is this expense for?" value="'+(d.label||'').replace(/"/g,'&quot;')+'">')+'</div>'+
+ (fixed?'<div class="fetched">'+ic('check',12,'#15883A',3)+' Bill fetched · Due '+d.due+'</div>':'')+
+ '</div><div style="background:#fff;padding-top:8px">'+
+ '<button class="rep" data-a="toggleRep" style="width:100%">'+ic('repeat',16,'#444',1.8)+'Repeat this bill &amp; split every month<span class="sw'+(d.rec?' on':'')+'"></span></button>'+
+ '<div class="pbar"><span class="lb">Paid By</span><button class="pchip'+(d.payer&&d.payer!=='multi'?'':' np')+'" data-a="whoPaid">'+payerChip(d)+ic('down',18,'#444',1.8)+'</button><span class="lb">Split</span><button class="pchip np" data-a="openSplitChip">'+({equal:'Equally',amount:'By Amounts',percent:'By %',shares:'By Shares'})[d.split.mode]+(d.splitChosen?' ('+splitMembers(d.split).length+')':'')+ic('down',18,'#444',1.8)+'</button></div>'+
+ '<div style="padding:0 16px"><button class="btn" data-a="addBillGo">Add Bill</button></div><button class="later" data-a="later">I\'ll add it later</button><div style="height:22px"></div></div></div>'};
+
+/* ---- HOW TO SPLIT ---- */
+PAGES.howsplit=p=>{const h=T.hs;const all=h.all;
+ const modes=[['equal','equal','Equally'],['amount','rupee','By Amounts'],['percent','pct','By Percentage'],['shares','pie','By Shares']];
+ const titles={equal:['Split equally','Select people to split the amount equally'],amount:['Split by amounts','Enter how much each person pays'],percent:['Split by percentage','Enter each person’s percentage'],shares:['Split by shares','Enter shares, e.g. 2 for a bigger room']};
+ let rows=all.map(m=>{let right;
+  if(h.mode==='equal'){const on=h.members.includes(m);right='<span class="cb'+(on?'':' off')+'">'+(on?ic('check',16,'#1577DC',2.6):'')+'</span>'}
+  else right='<input class="vin" data-in="hsval" data-m="'+m+'" inputmode="decimal" placeholder="'+(h.mode==='amount'?'₹0':h.mode==='percent'?'0%':'0')+'" value="'+(h.values[m]||'')+'">';
+  return '<'+(h.mode==='equal'?'button data-a="hsToggle" data-v="'+m+'"':'div')+' class="row" style="width:100%">'+av(m)+'<span class="tx"><span class="nm"><div class="n1">'+nm(m)+'</div></span>'+right+'</span></'+(h.mode==='equal'?'button':'div')+'>'}).join('');
+ return '<div class="scr"><div class="hdr"><button class="ib" data-a="back" aria-label="Back">'+ic('back',26,'#222',1.8)+'</button><span class="hs-h">How to split</span></div>'+
+ (h.single?'':'<div class="mchips">'+modes.map(x=>'<button class="mc'+(h.mode===x[0]?' on':'')+'" data-a="hsMode" data-v="'+x[0]+'">'+ic(x[1],22,h.mode===x[0]?'#fff':'#333',x[0]==='equal'?3:1.8)+x[2]+'</button>').join('')+'</div>')+
+ '<div class="body" style="padding-bottom:0"><div class="hcard list"><div class="hct">'+(h.single?'Who pays this recharge?':titles[h.mode][0])+'</div><div class="hcs">'+(h.single?'Only 1 person per recharge':titles[h.mode][1])+'</div>'+rows+'</div></div>'+
+ '<div class="foot" style="padding-top:12px">'+(p.ctx==='series'?'<div class="apnote">'+ic('repeat',14,'#245DA8',2)+'Applies to this month and every month after</div>':'')+'<div class="hfoot" id="hfoot"></div><button class="btn" id="hsbtn" data-a="hsSave">'+(p.btn||'Save')+'</button></div></div>'};
+function hsCalc(){const h=T.hs;const v=m=>+h.values[m]||0;
+ if(h.mode==='equal'){const n=h.members.length;return {ok:n>0,a:rs(n?h.amount/n:0)+' per person',b:'('+n+' '+(n===1?'person':'people')+' selected)',sa:!h.single}}
+ if(h.mode==='amount'){const s=h.all.reduce((a,m)=>a+v(m),0);const left=h.amount-s;return {ok:Math.abs(left)<0.5&&s>0,a:'<b>'+rs(s)+' of '+rs(h.amount)+'</b>',b:left>=0?rs(left)+' left':rs(-left)+' over',bad:left<0}}
+ if(h.mode==='percent'){const s=h.all.reduce((a,m)=>a+v(m),0);const left=100-s;return {ok:Math.abs(left)<0.01,a:'<b>'+(+s.toFixed(2))+'% of 100%</b>',b:left>=0?(+left.toFixed(2))+'% left':(+(-left).toFixed(2))+'% over',bad:left<0}}
+ const s=h.all.reduce((a,m)=>a+v(m),0);return {ok:s>0,a:'<b>'+s+' total share'+(s===1?'':'s')+'</b>',b:s?rs(h.amount/s)+' per share':'Enter at least one share'};}
+function hsFoot(){const r=hsCalc();const f=document.getElementById('hfoot');if(!f)return;const all=T.hs.mode==='equal'&&T.hs.members.length===T.hs.all.length;
+ f.innerHTML='<div style="'+(T.hs.mode==='equal'?'':'flex:1;text-align:center')+'"><div class="a">'+r.a+'</div><div class="b'+(r.bad?' warn':'')+'">'+r.b+'</div></div>'+(r.sa?'<button class="sa" data-a="hsAll">Select All<span class="cb'+(all?'':' off')+'">'+(all?ic('check',16,'#1577DC',2.6):'')+'</span></button>':'');
+ document.getElementById('hsbtn').disabled=!r.ok}
+AFTER.howsplit=hsFoot;
+
+/* ---- DONE (green) ---- */
+PAGES.done=p=>'<div class="scr done" data-a="doneNext"><div class="ck">'+ic('check',44,'#fff',3.4)+'</div><h3>'+p.t+'</h3><div class="s">'+p.s+'</div><div class="n">All members notified '+ic('bellr',28,'#fff',1.8)+'</div>'+(p.r?'<div class="r">'+ic('repeat',15,'#fff',2)+p.r+'</div>':'')+(p.o?'<div class="r" style="margin-top:12px"><span class="offp">'+p.o+'</span></div>':'')+'</div>';
+AFTER.done=p=>{doneT=setTimeout(()=>{if(top().n==='done')ACT.doneNext()},2400)};
+
+/* ================= SHEETS ================= */
+function shHead(t){return '<div class="sh-h"><div class="sh-t">'+t+'</div><button class="xbtn" data-a="closeSheet" aria-label="Close">'+ic('x',14,'#fff',2.6)+'</button></div>'}
+SHEETS.circlePick=p=>shHead(p.src==='payment'?'Add this bill to':'Your circles')+'<div class="sh-b list">'+(p.src==='payment'?'<div style="margin:0 16px 8px;padding:10px 12px;border-radius:12px;background:var(--sky);font-size:13.5px;display:flex;gap:10px;align-items:center"><span class="jio" style="width:32px;height:32px;font-size:12px">Jio</span>Mobile Recharge · ₹899 · paid 14 Nov</div>':'')+
+ S.circles.map(c=>'<button class="row" style="width:100%" data-a="pickCircle" data-v="'+c.id+'"><span class="cic" style="margin-right:12px">'+ic('circle',26,'#FB7A74',2)+'</span><span class="tx"><span class="nm"><div class="n1">'+c.name+'</div><div class="n2">'+c.members.length+' members · '+c.series.length+' bills</div></span>'+ic('right',20,'#888',2)+'</span></button>').join('')+
+ '<button class="row" style="width:100%" data-a="newCircle"><span class="av addm" style="margin-right:12px;background:#F4F6F8;border:1.5px dashed #C9CACC">'+ic('plus',24,'#222',1.8)+'</span><span class="tx"><span class="nm"><div class="n1" style="font-weight:600;color:#004299">Create new circle</div></span></span></button></div><div style="height:16px"></div>';
+SHEETS.whoPaid=()=>{const d=T.draft;const c=circ(d.cid);const fixed=d.cat!=='other';
+ return shHead('Who Paid?')+'<div class="sh-b list">'+(fixed?'<button class="row" style="width:100%" data-a="setPayer" data-v=""><span class="av" style="background:#F2F2F2">'+ic('lock',22,'#666',1.8)+'</span><span class="tx"><span class="nm"><div class="n1">Not paid yet</div><div class="n2">Anyone in the circle can pay it later</div></span><span class="rad lg'+(!d.payer?' on':'')+'" style="'+(!d.payer?'background:#1577DC':'')+'">'+(!d.payer?ic('check',15,'#fff',3):'')+'</span></span></button>':'')+
+ c.members.map(m=>'<button class="row" style="width:100%" data-a="setPayer" data-v="'+m+'">'+av(m)+'<span class="tx"><span class="nm"><div class="n1">'+nm(m)+'</div></span><span class="rad lg'+(d.payer===m?' on':'')+'" style="'+(d.payer===m?'background:#1577DC':'')+'">'+(d.payer===m?ic('check',15,'#fff',3):'')+'</span></span></button>').join('')+
+ '<button class="multi" data-a="multiPaid" style="width:calc(100% - 32px)"><span class="stack">'+c.members.slice(0,3).map(m=>av(m,'s')).join('')+'</span><span style="flex:1;margin-left:10px">Multiple people paid</span>'+ic('right',22,'#222',2)+'</button></div><div class="sh-f"><button class="btn" data-a="closeSheet">Save</button></div>'};
+SHEETS.multiPaid=()=>{const d=T.draft;const c=circ(d.cid);return shHead('Who Paid?')+'<div class="sh-b list">'+c.members.map(m=>'<div class="row">'+av(m)+'<span class="tx"><span class="nm"><div class="n1">'+nm(m)+'</div></span><input class="vin" data-in="mp" data-m="'+m+'" inputmode="numeric" placeholder="₹0" value="'+(T.mp[m]||'')+'"></span></div>').join('')+'</div><div style="border-top:1px solid var(--line);text-align:center;padding-top:14px" id="mpf"></div><div class="sh-f"><button class="btn" id="mpbtn" data-a="mpSave">Save</button></div>'};
+function mpFoot(){const d=T.draft;const s=Object.values(T.mp).reduce((a,v)=>a+(+v||0),0);const left=d.amount-s;const f=document.getElementById('mpf');if(!f)return;f.innerHTML='<div style="font-size:17px;font-weight:700">'+rs(s)+' of '+rs(d.amount)+'</div><div style="font-size:14px;color:'+(left<0?'#D9343F':'#707070')+';margin-top:4px">'+(left>=0?rs(left)+' left':rs(-left)+' over')+'</div>';document.getElementById('mpbtn').disabled=!(d.amount>0&&Math.abs(left)<0.5)}
+SHEETS.bill=p=>{const c=circ(p.cid);const b=c.bills.find(x=>x.id===p.bid);const s=c.series.find(x=>x.id===b.sid);const sh=shareMap(b.amount,b.split);
+ return shHead(s.label)+'<div class="sh-b"><div style="padding:0 16px 10px;font-size:14px;color:#555">'+(s.biller?s.biller+' · ':'')+mlabel(b.month)+'</div><div style="padding:0 16px;font-size:34px;font-weight:700;letter-spacing:-1px">'+rs(b.amount)+'</div><div style="padding:4px 16px 14px;font-size:14px;color:'+(b.status==='paid'?'#15883A':'#D9343F')+';font-weight:600">'+(b.status==='paid'?'Paid by '+Object.keys(b.paidBy).map(first).join(', ')+' on '+b.paidOn:'Due '+b.due+' · not paid yet')+'</div>'+
+ '<div style="background:var(--band);padding:10px 16px;font-size:14px;font-weight:600">Split '+splitDesc(b.split).toLowerCase()+'</div>'+Object.keys(sh).map(m=>'<div class="mrow">'+av(m,'s')+'<span class="nm">'+nm(m)+'</span><span class="am">'+rs(sh[m])+'</span></div>').join('')+'<div style="font-size:12.5px;color:#777;padding:8px 16px 0">To change who shares this bill, use the Split tab.</div></div>'+
+ '<div class="sh-f" style="display:flex;gap:10px">'+(b.status==='due'?'<button class="btn ghost" data-a="remindAll" data-v="'+b.id+'">Remind all</button><button class="btn" data-a="payBill" data-v="'+b.id+'">Pay '+rs(b.amount)+'</button>':'<button class="btn" data-a="closeSheet">Done</button>')+'</div>'};
+SHEETS.pay=p=>{const c=circ(p.cid);const b=c.bills.find(x=>x.id===p.bid);const s=c.series.find(x=>x.id===b.sid);
+ return shHead('Pay '+s.label)+'<div class="sh-b" style="padding:0 16px"><div style="font-size:14px;color:#555">'+(s.biller||'')+(s.consumer?' · '+s.consumer:'')+'</div><div style="font-size:38px;font-weight:700;letter-spacing:-1px;margin-top:10px">'+rs(b.amount-(b.off||0))+(b.off?' <span style="font-size:16px;color:#888;text-decoration:line-through;font-weight:500">'+rs(b.amount)+'</span> <span class="offp" style="vertical-align:6px">Flat ₹'+b.off+' off</span>':'')+'</div>'+
+ '<div style="margin-top:16px;border:1.5px solid #DCE6F2;border-radius:14px;padding:12px;display:flex;align-items:center;gap:12px"><span class="bic" style="width:36px;height:36px">'+ic('bank',18,'#0B3F8F',1.8)+'</span><div style="flex:1"><div style="font-size:15px">Bank A/c ••4321</div><div style="font-size:12.5px;color:#666">UPI · no convenience fee</div></div><span class="rad on">'+ic('check',13,'#fff',3)+'</span></div>'+
+ '<div style="font-size:12.5px;color:#666;margin-top:12px">After payment, the circle is notified and everyone’s share is added to balances.</div></div><div class="sh-f"><button class="btn" data-a="payConfirm" data-v="'+b.id+'">Pay '+rs(b.amount-(b.off||0))+'</button></div>'};
+SHEETS.settings=p=>{const c=circ(p.cid);return shHead('Circle settings')+'<div class="sh-b list">'+c.members.map(m=>'<div class="row">'+av(m)+'<span class="tx" style="min-height:64px"><span class="nm"><div class="n1">'+nm(m)+'</div><div class="n2">'+(m==='me'?'Admin':'Member')+'</div></span></span></div>').join('')+
+ '<button class="row" style="width:100%" data-a="addMember"><span class="av" style="margin-right:12px;background:#F4F6F8;border:1.5px dashed #C9CACC">'+ic('plus',24,'#222',1.8)+'</span><span class="tx"><span class="nm"><div class="n1" style="font-weight:600;color:#004299">Add Member</div></span></span></button></div><div style="height:16px"></div>'};
+SHEETS.addToBills=p=>{const c=circ(p.cid);const names=p.mem.map(first).join(' & ');
+ return shHead('Add '+names+' to bill splits?')+'<div class="sh-b list"><div style="padding:0 16px 8px;font-size:14px;color:#555">Choose the bills they should share. Their share starts this month and repeats every month.</div>'+c.series.filter(s=>s.cat!=='mobile').map(s=>{const on=T.pick.includes(s.id);return '<button class="row" style="width:100%" data-a="pickSeries" data-v="'+s.id+'"><span class="bic" style="margin-right:12px">'+ic(CATS[s.cat].ic,22,'#0B3F8F',1.7)+'</span><span class="tx"><span class="nm"><div class="n1">'+s.label+'</div><div class="n2">'+splitDesc(s.split)+'</div></span><span class="cb'+(on?'':' off')+'">'+(on?ic('check',16,'#1577DC',2.6):'')+'</span></span></button>'}).join('')+'</div>'+
+ '<div class="sh-f" style="display:flex;gap:10px"><button class="btn ghost" data-a="closeSheet">Not now</button><button class="btn" data-a="addToBillsGo">Add</button></div>'};
+SHEETS.addOne=p=>{const c=circ(p.cid);const s=c.series.find(x=>x.id===p.sid);
+ return shHead('Add '+first(p.m)+' to this bill?')+'<div class="sh-b" style="padding:0 16px"><div style="display:flex;align-items:center;gap:12px;margin:6px 0 12px">'+av(p.m)+'<div><div style="font-size:16px">'+nm(p.m)+'</div><div style="font-size:13px;color:#666">'+s.label+' · '+splitDesc(s.split)+'</div></div></div><div style="font-size:14px;color:#444;line-height:20px">'+(s.split.mode==='equal'?'The bill will be split equally among '+(s.split.members.length+1)+' people from this month and every month after.':'This bill uses a custom split, so you’ll set '+first(p.m)+'’s amount on the next screen.')+'</div></div>'+
+ '<div class="sh-f" style="display:flex;gap:10px"><button class="btn ghost" data-a="closeSheet">Cancel</button><button class="btn" data-a="addOneGo">Add</button></div>'};
+
+/* ================= ACTIONS ================= */
+ACT.back=back;ACT.closeSheet=()=>{SHEET=null;render()};
+ACT.nyi=()=>toast('Not part of this prototype');
+ACT.goHome=()=>{NAV=[{n:'home',p:{}}];SHEET=null;render(true)};
+ACT.openPay=()=>go('success');
+ACT.openPayAny=()=>go('payany');
+ACT.aiFromPay=cat=>{ACT.circleEntry('payment');T.flow.suggest=cat};
+ACT.aiAdd=cat=>{T.draft={cid:top().p.id};ACT.pickCat(cat)};
+ACT.aiDismiss=cat=>{const c=circ(top().p.id);(c.aiDismiss=c.aiDismiss||[]).push(cat);save();render()};
+function runSuggest(cid){const s=T.flow&&T.flow.suggest;if(!s)return;T.flow.suggest=null;const c=circ(cid);if(c.series.some(x=>x.cat===s))return;T.draft={cid};ACT.pickCat(s)}
+ACT.circleEntry=src=>{T.flow={src,sel:[],name:'Flat 402',mode:'create'};if(S.circles.length)sheet('circlePick',{src});else go('onboard',{i:0})};
+ACT.newCircle=()=>{SHEET=null;go('onboard',{i:0})};
+ACT.pickCircle=id=>{const c=circ(id);SHEET=null;if(T.flow.src==='payment'){if(c.series.some(s=>s.fromPay))toast('This recharge is already in '+c.name);else addPaymentBill(c);save()}
+ NAV=[{n:'home',p:{}},{n:'circle',p:{id,tab:'bills'}}];render(true);if(T.flow.src==='payment')toast('Jio recharge ₹899 added to '+c.name);runSuggest(id)};
+ACT.storyTap=(v,el,e)=>{if(e.target.closest('button'))return;const p=top().p;const r=el.getBoundingClientRect();const right=e.clientX>r.left+r.width/2;p.i=Math.max(0,Math.min(STORY.length-1,(p.i||0)+(right?1:-1)));render()};
+ACT.obStart=()=>go('select');
+ACT.selToggle=id=>{const s=T.flow.sel;const i=s.indexOf(id);if(i>=0)s.splice(i,1);else s.push(id);const q=T.q;render();T.q=q};
+ACT.selContinue=()=>{const f=T.flow;if(f.mode==='addmember'){const c=circ(f.cid);c.members.push(...f.sel);c.hist.push({t:'You added '+f.sel.map(first).join(', '),d:today()});save();const mem=f.sel.slice();popTo('circle');toast(mem.map(first).join(', ')+' added to the circle');const ns=c.series.filter(s=>s.cat!=='mobile');if(ns.length){T.pick=ns.map(s=>s.id);sheet('addToBills',{cid:c.id,mem})}return}go('details')};
+ACT.detRemove=id=>{const s=T.flow.sel;s.splice(s.indexOf(id),1);if(!s.length){back();return}render()};
+ACT.createCircle=()=>{const f=T.flow;const c={id:uid('c'),name:f.name.trim(),members:['me',...f.sel],series:[],bills:[],settle:[],hist:[{t:'You created the circle',d:today()}]};
+ if(f.src==='payment')addPaymentBill(c);S.circles.push(c);save();NAV=[{n:'home',p:{}},{n:'circle',p:{id:c.id,tab:'bills'}}];SHEET=null;render(true);
+ toast(f.src==='payment'?'Circle created · your Jio recharge is already in it':'Circle created · add your first bill');runSuggest(c.id)};
+function addPaymentBill(c){const s={id:uid('s'),cat:'mobile',biller:'Jio Prepaid',consumer:'98765 43210',label:'Mobile Recharge',split:{mode:'equal',members:['me'],values:{}},rec:true,fromPay:true};
+ const b={id:uid('b'),sid:s.id,month:S.month,amount:899,due:'14 '+mshort(S.month),status:'paid',paidBy:{me:899},paidOn:'14 '+mshort(S.month),split:clone(s.split)};
+ c.series.push(s);c.bills.push(b);const sh=shareMap(899,s.split);c.hist.push({t:'You paid ₹899 · Jio recharge',d:'14 '+mshort(S.month)+' · fetched from your payment',r:'You will get',rv:rs(899-(sh.me||0))})}
+ACT.tab=v=>{top().p.tab=v;render(true)};
+ACT.share=()=>toast('Invite link copied · share it on WhatsApp');
+ACT.settings=()=>sheet('settings',{cid:top().p.id});
+ACT.addMember=()=>{T.flow={mode:'addmember',cid:top().p.id,sel:[]};SHEET=null;go('select')};
+ACT.pickSeries=id=>{const i=T.pick.indexOf(id);if(i>=0)T.pick.splice(i,1);else T.pick.push(id);render()};
+ACT.addToBillsGo=()=>{const p=SHEET.p;const c=circ(p.cid);let custom=0;T.pick.forEach(sid=>{const s=c.series.find(x=>x.id===sid);p.mem.forEach(m=>addToSeries(c,s,m))});save();SHEET=null;render();toast('Added to '+T.pick.length+' bill'+(T.pick.length===1?'':'s')+' · repeats monthly')};
+function addToSeries(c,s,m){if(s.cat==='mobile')return;if(s.split.mode==='equal'){if(!s.split.members.includes(m))s.split.members.push(m)}else{s.split={mode:'equal',members:[...new Set(splitMembers(s.split).concat(m))],values:{}}}
+ applySeries(c,s)}
+function applySeries(c,s){const lb=latestBill(c,s.id);if(lb)c.bills.filter(b=>b.sid===s.id&&b.month>=lb.month).forEach(b=>b.split=clone(s.split))}
+ACT.addOne=v=>{const [sid,m]=v.split('|');sheet('addOne',{cid:top().p.id,sid,m})};
+ACT.addOneGo=()=>{const p=SHEET.p;const c=circ(p.cid);const s=c.series.find(x=>x.id===p.sid);
+ if(s.split.mode==='equal'){s.split.members.push(p.m);applySeries(c,s);c.hist.push({t:first(p.m)+' added to '+s.label,d:today()});save();SHEET=null;render();toast(first(p.m)+' now shares '+s.label+' every month')}
+ else{SHEET=null;openHS('series',{sid:s.id,cid:c.id,addm:p.m})}};
+ACT.editSplit=sid=>openHS('series',{sid,cid:top().p.id});
+ACT.markRec=m=>{const c=circ(top().p.id);const r=balances(c).rows.find(x=>x.m===m);c.settle.push({from:m,to:'me',amt:r.v});c.hist.push({t:first(m)+' paid you '+rs(r.v),d:today()+' · marked as received'});save();render();toast('Marked '+rs(r.v)+' as received from '+first(m))};
+ACT.settlePay=m=>{const c=circ(top().p.id);const r=balances(c).rows.find(x=>x.m===m);c.settle.push({from:'me',to:m,amt:-r.v});c.hist.push({t:'You paid '+first(m)+' '+rs(-r.v),d:today()+' · via UPI'});save();render();toast('Paid '+rs(-r.v)+' to '+first(m)+' via UPI')};
+ACT.remind=m=>toast('Reminder sent to '+first(m)+' on WhatsApp & Paytm');
+ACT.remindAll=()=>{SHEET=null;render();toast('Reminder sent to everyone in the circle')};
+ACT.billOpen=(id,el,e)=>{if(e.target.closest('[data-a="payBill"]'))return;sheet('bill',{cid:top().p.id,bid:id})};
+ACT.payBill=id=>sheet('pay',{cid:top().p.id,bid:id});
+ACT.payConfirm=id=>{const c=circ(top().p.id);const b=c.bills.find(x=>x.id===id);const s=c.series.find(x=>x.id===b.sid);if(b.off){b.saved=b.off;b.amount-=b.off;b.off=0}b.status='paid';b.paidBy={me:b.amount};b.paidOn=today();const sh=shareMap(b.amount,b.split);
+ c.hist.push({t:'You paid '+rs(b.amount)+' · '+s.label,d:today(),r:'You will get',rv:rs(b.amount-(sh.me||0))});save();SHEET=null;
+ go('done',{t:'Bill Paid !',s:rs(b.amount)+' · '+s.label,r:'',o:b.saved?'₹'+b.saved+' saved':''})};
+/* add bill */
+ACT.addBill=()=>{T.draft={cid:top().p.id};go('cats')};
+ACT.pickCat=k=>{const c=circ(T.draft.cid);const base={cid:c.id,cat:k,rec:true,split:{mode:'equal',members:k==='mobile'?['me']:c.members.slice(),values:{}},splitChosen:false};
+ if(k==='other'){T.draft=Object.assign(base,{amount:0,label:'',payer:'me',paidBy:null});go('amount')}
+ else{T.draft=Object.assign(base,{biller:CATS[k].b[0],consumer:CATS[k].v,fetched:false,payer:null});go('fetch')}};
+ACT.pickBiller=b=>{T.draft.biller=b;T.draft.fetched=false;render()};
+ACT.fetchBill=()=>{const d=T.draft;if(!String(d.consumer).trim()){toast('Enter '+CATS[d.cat].f);return}const k=CATS[d.cat];d.amount=k.a;d.due=(d.cat==='mobile'||d.cat==='lpg'||d.cat==='dth'?'Today':'20 '+mshort(S.month));if(d.due==='Today')d.due=today();d.fetched=true;render()};
+ACT.toAmount=()=>go('amount');
+ACT.toggleRep=()=>{T.draft.rec=!T.draft.rec;render()};
+ACT.whoPaid=()=>{if(!(T.draft.amount>0)&&T.draft.cat==='other'){toast('Enter the amount first');return}sheet('whoPaid')};
+ACT.setPayer=m=>{T.draft.payer=m||null;T.draft.paidBy=null;render()};
+ACT.multiPaid=()=>{T.mp=T.draft.payer==='multi'?Object.assign({},T.draft.paidBy):{};sheet('multiPaid')};
+ACT.mpSave=()=>{const pb={};Object.keys(T.mp).forEach(m=>{if(+T.mp[m]>0)pb[m]=+T.mp[m]});T.draft.payer='multi';T.draft.paidBy=pb;SHEET=null;render()};
+AFTER.amount=()=>{if(SHEET&&SHEET.n==='multiPaid')mpFoot()};
+ACT.openSplitChip=()=>{if(!(T.draft.amount>0)){toast('Enter the amount first');return}openHS('draft',{btn:'Save'})};
+ACT.addBillGo=()=>{const d=T.draft;if(!(d.amount>0)){toast('Enter the amount first');return}if(d.cat==='other'&&!d.label.trim()){toast('Add what this expense is for');return}
+ if(!d.splitChosen)openHS('draft',{btn:'Add Bill',commit:true});else commitDraft()};
+ACT.later=()=>popTo('circle');
+function openHS(ctx,p){let sp,amount,all;
+ if(ctx==='draft'){const d=T.draft;sp=d.split;amount=d.amount;all=circ(d.cid).members}
+ else{const c=circ(p.cid);const s=c.series.find(x=>x.id===p.sid);sp=s.split;const lb=latestBill(c,s.id);amount=lb?lb.amount:0;all=c.members}
+ T.hs={mode:sp.mode,members:splitMembers(sp),values:Object.assign({},sp.values||{}),amount,all:all.slice()};
+ if(p.addm){T.hs.values[p.addm]='';}
+ T.hs.single=(ctx==='draft'?T.draft.cat:circ(p.cid).series.find(x=>x.id===p.sid).cat)==='mobile';
+ if(T.hs.single){T.hs.mode='equal';T.hs.members=T.hs.members.slice(0,1);if(!T.hs.members.length)T.hs.members=['me']}
+ go('howsplit',Object.assign({ctx},p))}
+ACT.hsMode=m=>{const h=T.hs;if(h.mode===m)return;const cur=splitMembers({mode:h.mode,members:h.members,values:h.values});const mem=cur.length?cur:h.all.slice();
+ h.values={};
+ if(m==='equal')h.members=mem.slice();
+ if(m==='amount'){const sh=shareMap(h.amount,{mode:'equal',members:mem});mem.forEach(x=>h.values[x]=sh[x])}
+ if(m==='percent'){const b=Math.floor(100/mem.length);mem.forEach((x,i)=>h.values[x]=b+(i<100-b*mem.length?1:0))}
+ if(m==='shares')mem.forEach(x=>h.values[x]=1);
+ h.mode=m;render()};
+ACT.hsToggle=m=>{if(T.hs.single){T.hs.members=[m];render();return}const s=T.hs.members;const i=s.indexOf(m);if(i>=0)s.splice(i,1);else s.push(m);render()};
+ACT.hsAll=()=>{const h=T.hs;h.members=h.members.length===h.all.length?[]:h.all.slice();render()};
+ACT.hsSave=()=>{const h=T.hs;if(!hsCalc().ok)return;const p=top().p;
+ const sp={mode:h.mode,members:h.mode==='equal'?h.all.filter(m=>h.members.includes(m)):[],values:{}};
+ if(h.mode!=='equal')h.all.forEach(m=>{if(+h.values[m]>0)sp.values[m]=+h.values[m]});
+ if(p.ctx==='draft'){T.draft.split=sp;T.draft.splitChosen=true;if(p.commit){commitDraft();return}back();return}
+ const c=circ(p.cid);const s=c.series.find(x=>x.id===p.sid);s.split=sp;applySeries(c,s);c.hist.push({t:'You changed the split for '+s.label,d:today()+' · '+splitDesc(sp)});save();NAV.pop();render(true);toast('Split updated for this and upcoming months')};
+function commitDraft(){const d=T.draft;const c=circ(d.cid);const k=CATS[d.cat];
+ const s={id:uid('s'),cat:d.cat,biller:d.biller||'',consumer:d.consumer||'',label:d.cat==='other'?d.label.trim():k.t,split:clone(d.split),rec:d.rec};
+ const paid=!!d.payer;const pb=d.payer==='multi'?d.paidBy:(paid?{[d.payer]:d.amount}:null);
+ const off=(!paid&&d.cat!=='other'&&!c.series.some(x=>x.cat===d.cat))?TIER(catCount(c)+1):0;
+ const b={id:uid('b'),sid:s.id,month:S.month,amount:d.amount,due:d.due||today(),status:paid?'paid':'due',paidBy:pb,paidOn:today(),split:clone(d.split),off};
+ c.series.push(s);c.bills.push(b);const n=splitMembers(d.split).length;
+ const sh=shareMap(d.amount,d.split);const myGet=paid&&pb.me?pb.me-(sh.me||0):0;
+ c.hist.push({t:'You added '+s.label+' '+rs(d.amount),d:today()+' · split among '+n,r:myGet>0?'You will get':'',rv:myGet>0?rs(myGet):''});
+ save();go('done',{t:'Bill Added !',s:rs(d.amount)+' between '+n+' '+(n===1?'person':'people'),r:d.rec?'Same split repeats every month':'',o:off?'Flat ₹'+off+' off unlocked':''})}
+ACT.doneNext=()=>{clearTimeout(doneT);popTo('circle')};
+
+/* inputs */
+INP.search=v=>{T.q=v;const l=document.getElementById('clist');if(l)l.innerHTML=listHTML()};
+INP.cname=v=>{T.flow.name=v;const b=document.getElementById('cbtn');if(b)b.disabled=!(v.trim()&&T.flow.sel.length)};
+INP.consumer=v=>{T.draft.consumer=v};
+INP.amt=(v,el)=>{const n=parseInt(v.replace(/\D/g,''))||0;T.draft.amount=n;el.value=n||'';el.style.width=Math.max(1,String(n||0).length)*0.62+'em';T.draft.splitChosen=T.draft.splitChosen&&T.draft.split.mode==='equal';if(T.draft.split.mode!=='equal'){T.draft.split={mode:'equal',members:circ(T.draft.cid).members.slice(),values:{}}}};
+INP.label=v=>{T.draft.label=v};
+INP.hsval=(v,el)=>{T.hs.values[el.dataset.m]=v.replace(/[^\d.]/g,'');hsFoot()};
+INP.mp=(v,el)=>{T.mp[el.dataset.m]=v.replace(/\D/g,'');mpFoot()};
+
+app.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el||!app.contains(el))return;const a=el.dataset.a;if(ACT[a]){e.stopPropagation();ACT[a](el.dataset.v,el,e)}});
+app.addEventListener('input',e=>{const el=e.target;const a=el.dataset.in;if(a&&INP[a])INP[a](el.value,el)});
+
+/* demo controls + system nav */
+function nextMonthBills(){S.month=nextMonth(S.month);let n=0;
+ S.circles.forEach(c=>{c.series.filter(s=>s.rec).forEach(s=>{const lb=latestBill(c,s.id);if(!lb)return;const amt=s.cat==='mobile'||s.cat==='dth'?lb.amount:s.cat==='other'?lb.amount:Math.round(lb.amount*(0.9+Math.random()*0.2));
+  c.bills.push({id:uid('b'),sid:s.id,month:S.month,amount:amt,due:(s.cat==='mobile'?'14 ':'20 ')+mshort(S.month),status:'due',paidBy:null,paidOn:'',split:clone(s.split)});n++});
+  if(c.series.some(s=>s.rec))c.hist.push({t:MONL[+S.month.split('-')[1]-1]+' bills fetched',d:today()+' · split the same way as last month'})});
+ save();return n}
+document.getElementById('demo').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;const d=b.dataset.d;
+ if(d==='home')ACT.goHome();
+ if(d==='pay'){NAV=[{n:'home',p:{}},{n:'success',p:{}}];SHEET=null;render(true)}
+ if(d==='reset'){S=blank();save();T={flow:null,draft:null,hs:null,q:''};ACT.goHome();toast('Demo data reset')}
+ if(d==='month'){if(!S.circles.length){toast('Create a circle first');return}const n=nextMonthBills();render();toast(n+' bill'+(n===1?'':'s')+' fetched for '+mlabel(S.month)+' · same splits')}});
+document.getElementById('nbar').addEventListener('click',e=>{const b=e.target.closest('[data-sys]');if(!b)return;if(b.dataset.sys==='back')back();else ACT.goHome()});
+function fit(){const st=document.getElementById('stage');if(innerWidth<=640){st.style.zoom='';return}const s=Math.min(1,(innerHeight-40)/805,(innerWidth-20)/680);st.style.zoom=s<1?s:''}
+addEventListener('resize',fit);fit();
+if(location.hash==='#reset'){S=blank();save();history.replaceState(null,'',location.pathname)}
+const ck=()=>{const d=new Date();document.getElementById('clock').textContent=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')};ck();setInterval(ck,30000);
+window.__proto={get S(){return S},get NAV(){return NAV}};
+render(true);
+})();
+</script>
+</body>
+</html>
