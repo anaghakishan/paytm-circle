@@ -434,7 +434,7 @@ const circ=id=>S.circles.find(c=>c.id===id);
 function shareMap(amount,sp){
   const out={};const mem=sp.mode==='equal'?sp.members:Object.keys(sp.values||{}).filter(k=>+sp.values[k]>0);
   if(!mem.length)return out;
-  if(sp.mode==='amount'){mem.forEach(m=>out[m]=+sp.values[m]);return out}
+  if(sp.mode==='amount'&&Math.abs(mem.reduce((a,m)=>a+(+sp.values[m]),0)-amount)<0.5){mem.forEach(m=>out[m]=+sp.values[m]);return out}
   let weights;
   if(sp.mode==='equal')weights=mem.map(()=>1);
   else weights=mem.map(m=>+sp.values[m]);
